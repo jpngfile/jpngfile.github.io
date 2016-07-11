@@ -4,8 +4,73 @@ body {font-family: sans-serif;}
 
 .masthead {
 	width: 100%;
-	background-color: red;
+	height: auto;
+	background-color: white;
+	position: fixed;
+	top: 0;
+	
 }
 .masthead-title{
 	font-size: 18;
+	margin-bottom: 0em;
+}
+
+.masthead-title > a:link {
+	color: black;
+	text-decoration: none;
+}
+.masthead-title > small a:link {
+	color: black;
+	text-decoration: none;
+}
+
+
+.masthead-title > a:visited {
+	color: black;
+	text-decoration: none;
+}
+.masthead-title > small a:visited {
+	color: black;
+	text-decoration: none;
+}
+
+.masthead-title a:hover {
+	color: grey;
+}
+
+.masthead-title small a:hover {
+	color: grey;
+}
+
+
+.masthead-title a:active {
+
+}
+
+.masthead > small {
+	margin-top: 0em;
+}
+
+.main-body{
+	margin-top: 200px;
+	border-style: double;
+}
+
+#intro-text{
+	border-style: double;
+	border-color: red;
+	margin-left: 100px;
+	margin-right: 100px;
+}
+
+#intro-header {
+	font-size: 30pt;
+}
+
+.body-image{
+	width: 100%;
+}
+
+#content-image{
+	width: 100%;
 }
