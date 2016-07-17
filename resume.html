@@ -18,31 +18,33 @@
 	<div class="container">
 		<header class="masthead" id="masthead">
 			<h1 class="masthead-title">
-				<a href="/index.html">Jason P'ng</a>
+				<a href="index.html">Jason P'ng</a>
 				<small><a href="portfolio.html">Portfolio</a>
-				<a href="resume.html">Resume</a>
+				<a href="#">Resume</a>
 				<a href="#">Contact</a>
 				<a href="#">Fun</a></small>
 			</h1>
 			<small>Wooo, cool website stuffs. welfkjlkdfgdf</small>
 		</header>
 		<div class="main-body" id="main-body">
-			<div id="intro-text">			
-				<h1 id="intro-header">hi there,</h1>
-				<p>Some cool stuff will be going on here</p>
-			</div>
-
-			
-			<div class="body-image" id="body-image">
-				<img src="toronto.jpg" id="content-image">
-			</div>
- 			
+			<h1 class="heading">Resume</h1>
+			<span>Format : </span>
+			<select id="resumeType" onChange="changeResumeType()">
+				<option value="pdf">pdf</option>
+				<option value="json">json</option>
+				<option value="png">png</option>
+			</select>
+			<object class="resume" id="resumePdf" data="JasonP'ngResume(censored).pdf" type="application/pdf">
+				alt : <a href="JasonP'ngResume(censored).pdf">JasonP'ngResume</a>
+			</object>
+			<object class="resumeJson" id="resumeJson" data="JasonP'ngResume.json" type="application/json">
+				alt : <a href="JasonP'ngResume.json">JasonP'ngResume</a>
+			</object>
+			<img src="JasonP'ngResume(censored).png" alt="Jason P'ng Resume" class="resumeImage" id="resumePng">
 		</div>
-
 	</div>
 
 	<!-- scripts -->
 
 	<script type="text/javascript" src="main.js"></script>
-
 </body>

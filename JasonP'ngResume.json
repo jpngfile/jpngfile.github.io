@@ -1,0 +1,97 @@
+{
+	"name" : "Jason P'ng",
+	"titles" : ["Software Developer", "Project Manager", "Leader"],
+	"contact info" : {
+		"email" : "jsjpng@uwaterloo.ca",
+		"github" : "jpngfile"
+	},
+	"developer projects" : [
+		{
+			"title" : "SUYOP (Summer Youth Opportunities)",
+			"type" : "website",
+			"url" : "www.suyop.com",
+			"github link" : "https://github.com/jpngfile/SUYOP",
+			"timeline" : "December 2013 - present",
+			"description" : [
+				"Created a website that showcases extracurricular opportunities for high school students in the Toronto area.",
+				"The student user can filter through the displayed options by category, location, and time commitment.",
+				"Currently leading a four-person team to market SUYOP, which included designing posters and business cards that we distributed at targeted information events.",
+				"Used bootstrap, HTML, javascript, and CSS."
+			]
+		},
+		{
+			"title" : "Pngball",
+			"type" : "Game",
+			"github link" : "https://github.com/jpngfile/Maliable-PngBall",
+			"timeline" : "May 2013 - June 2013",
+			"description" : [
+				"Co-created an installable Java-based two-dimensional pinball game.",
+				"Implemented a 2D physics engine, which features multiple object collision and acceleration."
+			]
+		},
+		{
+			"title" : "Lawssons",
+			"type" : "Organization Tool",
+			"github link" : "https://github.com/jpngfile/LAWssons",
+			"timeline" : "October 2014 - November 2014",
+			"description" : [
+				"Developed an organizational tool in Java for managing swimming instructor lesson plans.",
+				"Through a graphical user interface, the swimming instructor can input, save, modify, and print custom lesson plans.",
+				"Used FileIO and Swing API"
+			]
+
+		}
+	],
+	"achievements" : {
+		"competitions" : [
+			"2nd Place Team, JDCC Programming Competition (2015)",
+			"10th Place Team, round one of the ECOO Programming
+			Contest (2015)"
+		],
+		"awards" : [
+			{
+				"title" : "Waterloo President’s Scholarship of Distinction (2015)",
+				"prerequisite" : "Awarded for having a 95%+ acceptance average"
+			},
+			{
+				"title" : "Gold Duke of Edinburgh Award (2015)",
+				"prerequisite" : "Awarded for three years commitment of adventurous expeditions, physical fitness, and community involvement."
+			},
+			{
+				"title" : "Lily Chong Memorial Scholarship (2014)",
+				"prerequisite" : "Awarded for outstanding performance in the Vision Youth Leadership Program."
+			}
+		]
+	},
+	"skills" : [
+		"Java",
+		"HTML/CSS",
+		"Racket",
+		"Command Line"
+	],
+	"Education" : {
+		"degree" : "Candidate for Bachelor of Computer Science, honours",
+		"timeline" : "2015 - 2020",
+		"university" : "University of Waterloo",
+		"honours" : "Fall 2015 Term Dean's Honours List"
+	},
+	"work experience" : [
+		{
+			"title" : "Lifeguard",
+			"location" : "City of Toronto",
+			"timeline" : "July 2015 - August 2015",
+			"description" : [
+				"Oversaw the safety of pool patrons, and ensured pool equipment was properly maintained.",
+				"Quickly analyzed and responded to customer concerns, and was responsible for maintaining the National Lifeguard qualification"
+			]
+		},
+		{
+			"title" : "Secretary",
+			"location" : "Lakeshore Medical Centre",
+			"timeline" : "August 2014 - October 2014",
+			"description" : [
+				"Provided frontline service for patients, organized patient appointments, and handled sensitive records."
+			]
+		}
+	]
+}
