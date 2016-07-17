@@ -1,6 +1,9 @@
 
 
-body {font-family: sans-serif;}
+html, body {
+	font-family: sans-serif;
+	height: 100%;
+}
 
 .masthead {
 	width: 100%;
@@ -55,6 +58,7 @@ body {font-family: sans-serif;}
 	margin-top: 200px;
 	border-style: double;
 	height: auto;
+	width: 100%;
 }
 
 #intro-text{
@@ -136,4 +140,9 @@ body {font-family: sans-serif;}
 .resumeImage{
 	width: 100%;
 	display: none;
+}
+
+#myCanvas{ 
+	height: 500px;
+	width: 500px;
 }

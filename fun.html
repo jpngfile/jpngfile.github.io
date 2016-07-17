@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,31 +21,20 @@
 			<h1 class="masthead-title">
 				<a href="index.html">Jason P'ng</a>
 				<small><a href="portfolio.html">Portfolio</a>
-				<a href="#">Resume</a>
+				<a href="resume.html">Resume</a>
 				<a href="contact.html">Contact</a>
 				<a href="fun.html">Fun</a></small>
 			</h1>
 			<small>Wooo, cool website stuffs. welfkjlkdfgdf</small>
 		</header>
 		<div class="main-body" id="main-body">
-			<h1 class="heading">Resume</h1>
-			<span>Format : </span>
-			<select id="resumeType" onChange="changeResumeType()">
-				<option value="pdf">pdf</option>
-				<option value="json">json</option>
-				<option value="png">png</option>
-			</select>
-			<object class="resume" id="resumePdf" data="JasonP'ngResume(censored).pdf" type="application/pdf">
-				alt : <a href="JasonP'ngResume(censored).pdf">JasonP'ngResume</a>
-			</object>
-			<object class="resumeJson" id="resumeJson" data="JasonP'ngResume.json" type="application/json">
-				alt : <a href="JasonP'ngResume.json">JasonP'ngResume</a>
-			</object>
-			<img src="JasonP'ngResume(censored).png" alt="Jason P'ng Resume" class="resumeImage" id="resumePng">
+			<canvas id="myCanvas" style="border:1px solid #000000;">
+</canvas>
 		</div>
 	</div>
 
 	<!-- scripts -->
 
 	<script type="text/javascript" src="main.js"></script>
+	<script type="text/javascript" src="fun.js"></script>
 </body>
