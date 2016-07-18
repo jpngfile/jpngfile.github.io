@@ -11,6 +11,11 @@
 
 	//Note: remember to resize everything when the display size changes
 	function init(){
+
+		window.addEventListener ("beforeunload", function() {
+			document.body.classList.add("animate-out");
+		});
+		
 		var masthead = document.getElementById('masthead');
 		var mastheadHeight;
 		if (masthead.offsetHeight){
@@ -22,6 +27,7 @@
 		var mainContent = document.getElementById('main-body');
 		mainContent.style.marginTop = mastheadHeight + 'px';
 
+		
 
 		console.log ("init header")
 	}
