@@ -2,12 +2,6 @@
 	'use strict';
 
 	function drawCircle(){
-		/*var canvas = document.getElementById("canvas");
-		var context = canvas.getContext("2d");
-		context.beginPath();
-		context.arc(100,50,50,0,2*Math.PI);
-		context.fill();*/
-
 		var c = document.getElementById("myCanvas");
 		var ctx = c.getContext("2d");
 		ctx.clearRect (0,0,c.width, c.height);
@@ -58,20 +52,19 @@
 		setInterval(moveCircle, 5);
 	}
 
+	function setCirclePos (event) {
+		circleX = event.clientX;
+		circleY = event.clientY;
+	}
+
 	//Note: remember to resize everything when the display size changes
 	function init(){
-		var masthead = document.getElementById('masthead');
-		var mastheadHeight;
-		if (masthead.offsetHeight){
-			mastheadHeight = masthead.offsetHeight;
-		} else if (masthead.style.pixelHeight){
-			mastheadHeight = masthead.style.pixelHeight;
-		}
-
+		
 		var mainContent = document.getElementById('main-body');
-		mainContent.style.marginTop = mastheadHeight + 'px';
 		mainContent.style.borderStyle = "none";
 
+		var c = document.getElementById("myCanvas");
+		c.onclick = setCirclePos;
 
 		console.log ("init header")
 	}

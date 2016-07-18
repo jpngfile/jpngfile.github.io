@@ -1,21 +1,7 @@
 (function (window,document){
 	'use strict';
 
-	function drawCircle(){
-		var canvas = document.getElementById("canvas");
-		var context = canvas.getContext("2d");
-		context.beginPath();
-		context.arc(100,75,50,0,2*Math.PI);
-		context.stroke();
-	}
-
-	//Note: remember to resize everything when the display size changes
-	function init(){
-
-		window.addEventListener ("beforeunload", function() {
-			document.body.classList.add("animate-out");
-		});
-		
+	function resizeMasthead () {
 		var masthead = document.getElementById('masthead');
 		var mastheadHeight;
 		if (masthead.offsetHeight){
@@ -26,6 +12,17 @@
 
 		var mainContent = document.getElementById('main-body');
 		mainContent.style.marginTop = mastheadHeight + 'px';
+	}
+
+	//Note: remember to resize everything when the display size changes
+	function init(){
+
+		window.addEventListener ("beforeunload", function() {
+			document.body.classList.add("animate-out");
+		});
+
+		window.addEventListener ("resize", resizeMasthead);
+		resizeMasthead();
 
 		
 
