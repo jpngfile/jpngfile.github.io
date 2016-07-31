@@ -54,7 +54,7 @@
 
 	function setCirclePos (event) {
 		circleX = event.clientX;
-		circleY = event.clientY;
+		circleY = event.clientY - 100;
 	}
 
 	//Note: remember to resize everything when the display size changes
