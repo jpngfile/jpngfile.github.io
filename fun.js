@@ -34,6 +34,7 @@
 	var circleRadius = 20;
 	var prevTime = 0
 	var epsilon = 0.00001
+	var paused = false
 	function moveCircle(){
 
 		var currentTime = Date.now();
@@ -107,8 +108,9 @@
 					x : (b * (b * point.x - a * point.y) - a * c) / a2plusb2,
 					y : (a * (-b * point.x + a * point.y) - b * c) / a2plusb2
 				}
-				var distance = Math.abs (a * point.x + b * point.y + c) / a2plusb2;
-				//console.log (distance);
+				var distance = Math.abs (a * point.x + b * point.y + c) / Math.sqrt (a2plusb2);
+				console.log ("shortest distance");
+				console.log (distance);
 				//Check if collision is possible
 				if (circleRadius >= distance) {
 					//Get distance from closest point to collision point
@@ -154,8 +156,8 @@
 						console.log (timeLeft);
 
 						console.log ("scalar distances");
-						console.log (vectorDistanceToEndPoint);
-						console.log (vectorDistanceToCollisionPoint);
+						console.log (distanceBetweenPoints (point, closestPoint));
+						console.log (distanceBetweenPoints (point, closerCollisionPoint));
 
 						console.log ("Points");
 
@@ -171,10 +173,19 @@
 
 						//draw velocity
 						ctx.moveTo (circleX, circleY);
-						ctx.lineTo (circleX + velocityUnitVector.x * 40, circleY + velocityUnitVector.y * 40);
+						ctx.lineTo (circleX + velocityUnitVector.x * 100, circleY + velocityUnitVector.y * 100);
+
+						//draw collision point
+						ctx.moveTo (point.x, point.y);
+						ctx.lineTo (closerCollisionPoint.x, closerCollisionPoint.y);
+
+						//draw closest point
+						ctx.moveTo (point.x, point.y);
+						ctx.lineTo (closestPoint.x, closestPoint.y);
 						ctx.stroke();
 
-						//clearInterval (animation);
+						clearInterval (animation);
+						paused = true;
 					}
 
 					//Otherwise, ignore the result
@@ -234,6 +245,7 @@
 		ctx = c.getContext("2d");
 		prevTime = Date.now();
 		animation = setInterval(moveCircle, 50);
+		paused = false;
 	}
 
 	/*
@@ -318,6 +330,10 @@
 		return ((vector.x * pointDiff.x) + (vector.y * pointDiff.y)) / (vector.x * vector.x + vector.y * vector.y);
 	}
 
+	function distanceBetweenPoints (point1, point2) {
+		return Math.sqrt ((point2.x - point1.x)*(point2.x - point1.x) + (point2.y - point1.y)*(point2.y - point1.y))
+	}
+
 	function printAngle (vector1, vector2) {
 		var dot = vector1.x * vector2.x + vector1.y * vector2.y;
 		var det = vector1.x * vector2.y - vector1.y * vector2.x;
@@ -385,7 +401,12 @@
 
 	function pauseAnimation(event) {
 		console.log ("pressed key");
-		clearInterval (animation);
+		if (paused) {
+			startAnimation ();
+		} else {
+			paused = true;
+			clearInterval (animation);
+		}
 	}
 
 	document.onkeydown = pauseAnimation;
