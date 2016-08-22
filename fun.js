@@ -17,6 +17,11 @@
 			ctx.lineTo (line.x2, line.y2);
 		});
 
+		lineSegments.forEach(function (line) {
+			ctx.moveTo (line.x1, line.y1);
+			ctx.lineTo (line.x2, line.y2);
+		});
+
 
 		points.forEach (function (point) {
 			ctx.fillRect(point.x, point.y, 1, 1);
@@ -26,10 +31,10 @@
 	}
 
 	var circleX = 110;
-	var circleY = 170;
+	var circleY = 130;
 	var circleVel = {
-		x : 0,
-		y : -0.1
+		x : 0.1,
+		y : 0.1
 	};
 	var circleRadius = 20;
 	var prevTime = 0
@@ -85,32 +90,9 @@
 				}
 				//console.log ("acknowledge point");
 
-				//get Point of shortest distance
-				//First, find standard form of line
-				//y = mx + b -> 0 = mx - y + b
-				//Standard form = ax + by + c = 0
-				var slope = (circleEndPoint.y - circleY) / (circleEndPoint.x - circleX);
-				//console.log (slope);
-				var a, b, c;
-				if (slope == Infinity || slope == -Infinity) {
-					a = 1;
-					b = 0;
-					c = -circleX;
-				} else {
-				 a = slope;
-				 b = -1;
-				 c = circleY - (slope * circleX);
-				}
-
-				//Next, find the point on the line and distance
-				var a2plusb2 = Math.pow (a, 2) + Math.pow (b, 2);
-				var closestPoint = {
-					x : (b * (b * point.x - a * point.y) - a * c) / a2plusb2,
-					y : (a * (-b * point.x + a * point.y) - b * c) / a2plusb2
-				}
-				var distance = Math.abs (a * point.x + b * point.y + c) / Math.sqrt (a2plusb2);
-				console.log ("shortest distance");
-				console.log (distance);
+				var result = distanceFromPointToLine ({x1 : circleX, y1 : circleY, x2 : circleEndPoint.x, y2 : circleEndPoint.y}, point)
+				var distance = result.distance;
+				var closestPoint = result.closestPoint;
 				//Check if collision is possible
 				if (circleRadius >= distance) {
 					//Get distance from closest point to collision point
@@ -147,8 +129,8 @@
 						collision.collisionResponse = collisionResponsePoint;
 						collision.shape = point;
 
-
-						halting = true;
+						/*
+						//halting = true;
 						console.log ("unit vector");
 						console.log (velocityUnitVector);
 
@@ -184,8 +166,9 @@
 						ctx.lineTo (closestPoint.x, closestPoint.y);
 						ctx.stroke();
 
-						clearInterval (animation);
-						paused = true;
+						//clearInterval (animation);
+						//paused = true;
+						*/
 					}
 
 					//Otherwise, ignore the result
@@ -320,6 +303,15 @@
 		*/
 	}
 
+	function collisionResponseLine (line, time) {
+		console.log ("line segment collision");
+		circleX += circleVel.x * time
+		circleY += circleVel.y * time
+		var closerPointResult = distanceFromPointToLine (line, {x : circleX, y : circleY})
+		var closestPoint = closerPointResult.closestPoint;
+		collisionResponsePoint(closestPoint, 0);
+	}
+
 	function scalarMultipleOfVector (vector, point1, point2) {
 		//Assert point2 - point1 = vector
 		var pointDiff = {
@@ -330,9 +322,41 @@
 		return ((vector.x * pointDiff.x) + (vector.y * pointDiff.y)) / (vector.x * vector.x + vector.y * vector.y);
 	}
 
+	//returns both the closest point and the distance
+	function distanceFromPointToLine (line, point) {
+		//get Point of shortest distance
+		//First, find standard form of line
+		//y = mx + b -> 0 = mx - y + b
+		//Standard form = ax + by + c = 0
+		var slope = (line.y2 - line.y1) / (line.x2 - line.x1);
+		//console.log (slope);
+		var a, b, c;
+		if (slope == Infinity || slope == -Infinity) {
+			a = 1;
+			b = 0;
+			c = -line.x1;
+		} else {
+			a = slope;
+			b = -1;
+			c = line.y1 - (slope * line.x1);
+		}
+
+		//Next, find the point on the line and distance
+		var a2plusb2 = Math.pow (a, 2) + Math.pow (b, 2);
+		var closestPoint = {
+			x : (b * (b * point.x - a * point.y) - a * c) / a2plusb2,
+			y : (a * (-b * point.x + a * point.y) - b * c) / a2plusb2
+		}
+		var distance = Math.abs (a * point.x + b * point.y + c) / Math.sqrt (a2plusb2);
+
+		return {closestPoint : closestPoint,
+				distance : distance};
+	}
+
 	function distanceBetweenPoints (point1, point2) {
 		return Math.sqrt ((point2.x - point1.x)*(point2.x - point1.x) + (point2.y - point1.y)*(point2.y - point1.y))
 	}
+
 
 	function printAngle (vector1, vector2) {
 		var dot = vector1.x * vector2.x + vector1.y * vector2.y;
@@ -345,8 +369,51 @@
 		console.log (vector1String + " " + vector2String + " " + angle);
 	}
 
+	function sumOfVectors (vector1, vector2) {
+		return {x : vector1.x + vector2.x, y : vector1.y + vector2.y}
+	}
+
+	function multiplyVectorByScalar (vector, scalar) {
+		return {x : vector.x * scalar, y : vector.y * scalar}
+	}
+
+	//returns an array of 2 vectors, both the perpedicular distance from the original vector
+	function perpendicularVector (vector, distance) {
+
+		var vectorDistance = distanceBetweenPoints ({x : 0, y : 0}, vector);
+		//assert the vector is not zero
+		if (vectorDistance == 0) {
+			return [vector, vector];
+		}
+		var vector1 = {x : vector.y, y : vector.x};
+		var vector2 = {x : -vector.y, y : -vector.x};
+
+		var distanceRatio = distance / vectorDistance;
+
+		return [multiplyVectorByScalar (vector1, distanceRatio), multiplyVectorByScalar(vector2, distanceRatio)]
+
+	}
+
+	function intersectionOfLines (line1, line2) {
+
+		var x1 = line1.x1, x2 = line1.x2, x3 = line2.x1, x4 = line2.x2;
+		var y1 = line1.y1, y2 = line1.y2, y3 = line2.y1, y4 = line2.y2;
+		//Find intersection point using determinants
+		var denominator = (x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4)
+
+		//if the lines are parallel (including coincident)
+		if (denominator == 0) {
+			return null
+		}
+
+		return {x : (((x1 * y2) - (y1 * x2)) * (x3 - x4) - (x1 - x2) * ((x3 * y4) - (y3 * x4))) / denominator,
+				y : (((x1 * y2) - (y1 * x2)) * (y3 - y4) - (y1 - y2) * ((x3 * y4) - (y3 * x4))) / denominator}
+
+	}
+
 	var points = [];
-	var lines = []
+	var lines = [];
+	var lineSegments = [];
 
 	function setCirclePos (event) {
 		circleX = event.clientX;
@@ -375,8 +442,29 @@
 	{x1 : 0, y1 : height - 5, x2 : width, y2 : height - 5},
 	];
 
+	lineSegments = [
+	{x1 : 200, y1 : 0, x2 : 250, y2 : height}];
+
 	points = [
-	{x : 100, y : 100}
+	{x : 100, y : 100},
+	{x : 200, y : 100},
+	{x : 300, y : 100},
+	{x : 400, y : 100},
+
+	{x : 100, y : 200},
+	{x : 200, y : 200},
+	{x : 300, y : 200},
+	{x : 400, y : 200},
+
+	{x : 100, y : 300},
+	{x : 200, y : 300},
+	{x : 300, y : 300},
+	{x : 400, y : 300},
+
+	{x : 100, y : 400},
+	{x : 200, y : 400},
+	{x : 300, y : 400},
+	{x : 400, y : 400}
 	];
 		console.log ("init header")
 
