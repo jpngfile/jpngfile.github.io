@@ -34,7 +34,7 @@
 	var circleY = 130;
 	var circleVel = {
 		x : 0.1,
-		y : 0.1
+		y : 0.7
 	};
 	var circleRadius = 20;
 	var prevTime = 0
@@ -79,9 +79,53 @@
 				}
 			})
 
+			//TODO: Add check to make sure the collision takes place on the line segment. Currently takes place on infinite line
+			lineSegments.forEach (function (line) {
+				//Ignore end points for now. This will be fixed later
+				var circleEndPoint = {
+					x : circleX + circleVel.x * timeLeft,
+					y :	circleY + circleVel.y * timeLeft
+				}
 
+				var perpedicularLines = perpendicularVector (vectorOfline(line), circleRadius);	
+				var collisionLine1 = translateLine (line, perpedicularLines[0])
+				var collisionLine2 = translateLine (line, perpedicularLines[1])
 
-			
+				var circleVelLine = {x1 : circleX, y1 : circleY, x2 : circleEndPoint.x , y2 : circleEndPoint.y}
+
+				var collisionPoint1 = intersectionOfLines(circleVelLine, collisionLine1);
+				var collisionPoint2 = intersectionOfLines(circleVelLine, collisionLine2);
+
+				if (collisionPoint1 != null && collisionPoint2 != null) {
+
+					var distanceBetweenCollisionPoints = relativeDistanceBetweenPoints(collisionPoint1, collisionPoint2, circleEndPoint)
+					//if the circle is not intersecting the line segment
+					if (distanceBetweenCollisionPoints >= 0 && distanceBetweenCollisionPoints <= 1) {
+						var closerCollisionPoint = null;
+						var closerCollisionDistance = null;
+
+						var collisionDistance1 = relativeDistanceBetweenPoints({x : circleX, y : circleY}, circleEndPoint, collisionPoint1);
+						var collisionDistance2 = relativeDistanceBetweenPoints({x : circleX, y : circleY}, circleEndPoint, collisionPoint2);
+
+						//This is actually enough to check because if the distance would be negative, the collision won't happen anyways
+						if (collisionDistance1 < collisionDistance2) {
+							closerCollisionPoint = collisionPoint1;
+							closerCollisionDistance = collisionDistance1;
+						} else {
+							closerCollisionPoint = collisionPoint2;
+							closerCollisionDistance = collisionDistance2;
+						}
+
+						//If the collision will happen within the time frame
+						if (closerCollisionDistance >= 0 && closerCollisionDistance <= 1) {
+							collision.time = scalarMultipleOfVector (circleVel, {x : circleX, y : circleY}, closerCollisionPoint);
+							collision.collisionResponse = collisionResponseLine
+							collision.shape = line;
+						}
+					}
+				}
+			})
+	
 			points.forEach ( function (point) {
 				//Get the circle endpoint
 				var circleEndPoint = {
@@ -176,16 +220,17 @@
 				}
 			})
 			
+			//Note: currently only the lasts collision takes place, rather than the earliest
 			if (collision.shape != null) {
 				
-				console.log (collision.time);
+				//console.log (collision.time);
 				collision.collisionResponse (collision.shape, collision.time);
 
 				//draw velocity
 				//ctx.strokeStyle="#FF0000";
-						ctx.moveTo (circleX, circleY);
-						ctx.lineTo (circleX + circleVel.x * 500, circleY + circleVel.y * 500);
-						ctx.stroke();
+				//		ctx.moveTo (circleX, circleY);
+				//		ctx.lineTo (circleX + circleVel.x * 500, circleY + circleVel.y * 500);
+				//		ctx.stroke();
 
 				timeLeft-= collision.time;
 				collisionCounter++;
@@ -231,13 +276,6 @@
 		paused = false;
 	}
 
-	/*
-	Notes : TODO
-	Functions
-	-Point collision reaction
-	-Point collision time
-
-	*/
 	function collisionResponseLineHorizontal (line, time) {
 
 		if (circleX  >= line.x1) {
@@ -262,7 +300,7 @@
 
 //Messed up because the wrong line is being compared to
 	function collisionResponsePoint (point, time) {
-		console.log ("point collision");
+		//console.log ("point collision");
 		circleX += circleVel.x * time
 		circleY += circleVel.y * time
 		var collisionVector = {
@@ -274,9 +312,13 @@
 		var angle = Math.atan2(det, dot);
 
 		var angleInDegrees = angle * (180 / Math.PI);
+
+		/*
 		console.log (collisionVector);
 		console.log ({x : circleVel.x, y : circleVel.y});
 		console.log (angleInDegrees);
+		*/
+
 		//angle is always < Math.PI, so rotationAngle > 0
 		var rotationAngle = -(Math.PI - 2*angle)
 		var cosAngle = Math.cos (rotationAngle);
@@ -293,9 +335,11 @@
 		circleVel.x = newVelX;
 		circleVel.y = newVelY;
 
+/*
 		console.log ("new velocities");
 		console.log (newVelX);
 		console.log (newVelY);
+		*/
 		/*
 		var vector1String = "(" + circleVel.x + ", " + circleVel.y + ")";
 		var vector2String = "(" + collisionVector.x + ", " + collisionVector.y + ")";
@@ -312,6 +356,7 @@
 		collisionResponsePoint(closestPoint, 0);
 	}
 
+	//Point 1 and point2 represent a line segment
 	function scalarMultipleOfVector (vector, point1, point2) {
 		//Assert point2 - point1 = vector
 		var pointDiff = {
@@ -320,6 +365,11 @@
 		}
 
 		return ((vector.x * pointDiff.x) + (vector.y * pointDiff.y)) / (vector.x * vector.x + vector.y * vector.y);
+	}
+
+	function relativeDistanceBetweenPoints (point1, point2, targetPoint) {
+		//assert all three points are on the same line
+		return scalarMultipleOfVector (vectorOfTwoPoints(point1, point2), point1, targetPoint)
 	}
 
 	//returns both the closest point and the distance
@@ -385,13 +435,27 @@
 		if (vectorDistance == 0) {
 			return [vector, vector];
 		}
-		var vector1 = {x : vector.y, y : vector.x};
-		var vector2 = {x : -vector.y, y : -vector.x};
+		var vector1 = {x : vector.y, y : -vector.x};
+		var vector2 = {x : -vector.y, y : vector.x};
+
+		//console.log (vectorDistance);
 
 		var distanceRatio = distance / vectorDistance;
 
 		return [multiplyVectorByScalar (vector1, distanceRatio), multiplyVectorByScalar(vector2, distanceRatio)]
 
+	}
+
+	function translateLine (line, translation) {
+		return {x1 : line.x1 + translation.x, y1 : line.y1 + translation.y, x2 : line.x2 + translation.x, y2 : line.y2 + translation.y}
+	}
+
+	function vectorOfline (line) {
+		return {x : line.x2 - line.x1, y : line.y2 - line.y1}
+	}
+
+	function vectorOfTwoPoints (point1, point2) {
+		return {x : point2.x - point1.x, y : point2.y - point1.y}
 	}
 
 	function intersectionOfLines (line1, line2) {
@@ -442,9 +506,17 @@
 	{x1 : 0, y1 : height - 5, x2 : width, y2 : height - 5},
 	];
 
+	var testLine = {x1 : 200, y1 : 0, x2 : 250, y2 : height};
+	var perpedicularLines = perpendicularVector (vectorOfline(testLine), 50);
+	console.log(perpedicularLines);
 	lineSegments = [
-	{x1 : 200, y1 : 0, x2 : 250, y2 : height}];
+		{x1 : 0, y1 : height/2, x2 : width/2, y2 : 0},
+		{x1 : width/2, y1 : 0, x2 : width, y2 : height/2},
+		{x1 : width, y1 : height/2, x2 : width/2, y2 : height},
+		{x1 : width/2, y1 : height, x2 : 0, y2 : height/2}
+	];
 
+/*
 	points = [
 	{x : 100, y : 100},
 	{x : 200, y : 100},
@@ -466,8 +538,10 @@
 	{x : 300, y : 400},
 	{x : 400, y : 400}
 	];
+	*/
 		console.log ("init header")
 
+/*
 		printAngle ({x : 1, y : 1}, {x : 1, y : 0});
 		printAngle ({x : -1, y : 1}, {x : 1, y : 0});
 		printAngle ({x : -1, y : -1}, {x : 1, y : 0});
@@ -477,6 +551,17 @@
 		printAngle ({x : 1, y : 1}, {x : -1, y : -1});
 
 		printAngle ({x : 1, y : 1}, {x : -1, y : 0});
+		*/
+		/*
+		var testVector = {x : 1, y : 1}
+		var zeroPoint = {x : 0, y : 0}
+		console.log ("some vector distances")
+		console.log (scalarMultipleOfVector(testVector, zeroPoint, {x : 1, y : 1}));
+		console.log (scalarMultipleOfVector(testVector, zeroPoint, {x : 2, y : 2}));
+		console.log (scalarMultipleOfVector(testVector, zeroPoint, {x : -0.5, y : -0.5}));
+		console.log (scalarMultipleOfVector(testVector, zeroPoint, {x : Math.PI, y : Math.PI}));
+		*/
+		//console.log (relativeDistanceBetweenPoints ({x : 1, y : 1}, {x : 2, y : 2}, {x : 4, y : 4}));
 	}
 
 
