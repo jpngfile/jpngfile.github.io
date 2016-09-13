@@ -1,0 +1,107 @@
+	/*
+				//Get the circle endpoint
+				var circleEndPoint = {
+					x : circleX + circleVel.x * timeLeft,
+					y :	circleY + circleVel.y * timeLeft
+				}
+				//console.log ("acknowledge point");
+
+				var result = distanceFromPointToLine ({x1 : circleX, y1 : circleY, x2 : circleEndPoint.x, y2 : circleEndPoint.y}, point)
+				var distance = result.distance;
+				var closestPoint = result.closestPoint;
+				//Check if collision is possible
+				if (circleRadius >= distance) {
+					//Get distance from closest point to collision point
+					var distanceFromClosestPoint = Math.sqrt (Math.pow (circleRadius, 2) - Math.pow (distance, 2));
+					//Find the collision point
+					//Get unit vector for circle velocity
+					var velocityMag = Math.sqrt (Math.pow (circleVel.x, 2) + Math.pow (circleVel.y, 2));
+					var velocityUnitVector = {
+						x : circleVel.x / velocityMag,
+						y : circleVel.y / velocityMag
+					}
+					
+					
+					//3 Possible scenarios
+					//1. closer collision point is on the line -> take the closer point
+					//2. closer collision point is farther than end point -> A collision won't occur in the given time frame, but may later
+					//3. closer collision point is earlier than circle point -> This is an error. This means the circle is overlapping with the point.
+																	 		  //Should find a way to push the circle away
+
+					
+					var closerCollisionPoint = {
+						x : closestPoint.x - velocityUnitVector.x * distanceFromClosestPoint,
+						y : closestPoint.y - velocityUnitVector.y * distanceFromClosestPoint
+					}
+
+					//Note: Is it faster to just use x (or y if velX = 0) position? Would have to compensate for vector direction
+					//Find distance relative to velocity vector
+					var vectorDistanceToEndPoint = scalarMultipleOfVector (circleVel, {x : circleX, y : circleY}, circleEndPoint);
+					var vectorDistanceToCollisionPoint = scalarMultipleOfVector (circleVel, {x : circleX, y : circleY}, closerCollisionPoint);
+
+					if (vectorDistanceToCollisionPoint >= 0 && vectorDistanceToCollisionPoint <= vectorDistanceToEndPoint) {
+						//collision.time = scalarMultipleOfVector ({x : circleVel.x, y : circleVel.y}, {x : circleX, y : circleY}, closerCollisionPoint);
+						collision.time = scalarMultipleOfVector (velocityUnitVector, {x : circleX, y : circleY}, closerCollisionPoint);
+						collision.collisionResponse = collisionResponsePoint;
+						collision.shape = point;
+*/
+						/*
+						//halting = true;
+						console.log ("unit vector");
+						console.log (velocityUnitVector);
+
+						console.log ("time left");
+						console.log (timeLeft);
+
+						console.log ("scalar distances");
+						console.log (distanceBetweenPoints (point, closestPoint));
+						console.log (distanceBetweenPoints (point, closerCollisionPoint));
+
+						console.log ("Points");
+
+						console.log (closerCollisionPoint);
+
+						console.log ({x : circleX, y: circleY});
+						console.log (circleEndPoint);
+						console.log (collision);
+
+						ctx.beginPath();
+						ctx.moveTo (circleX, circleY);
+						ctx.lineTo (point.x, point.y);
+
+						//draw velocity
+						ctx.moveTo (circleX, circleY);
+						ctx.lineTo (circleX + velocityUnitVector.x * 100, circleY + velocityUnitVector.y * 100);
+
+						//draw collision point
+						ctx.moveTo (point.x, point.y);
+						ctx.lineTo (closerCollisionPoint.x, closerCollisionPoint.y);
+
+						//draw closest point
+						ctx.moveTo (point.x, point.y);
+						ctx.lineTo (closestPoint.x, closestPoint.y);
+						ctx.stroke();
+
+						//clearInterval (animation);
+						//paused = true;
+						*/
+						/*
+					}
+
+					//Otherwise, ignore the result
+
+				}
+				*/
+
+//Collision detection point
+
+/*
+		console.log ("new velocities");
+		console.log (newVelX);
+		console.log (newVelY);
+		*/
+		/*
+		var vector1String = "(" + circleVel.x + ", " + circleVel.y + ")";
+		var vector2String = "(" + collisionVector.x + ", " + collisionVector.y + ")";
+		console.log (vector1String + " " + vector2String + " " + angle);
+		*/
