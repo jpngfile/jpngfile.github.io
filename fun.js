@@ -5,22 +5,112 @@
 		
 		ctx.clearRect (0,0,c.width, c.height);
 		
+		//ctx.strokeStyle='#000000'
 		//ctx.canvas.width = "500px";//window.innerWidth;
 		//ctx.canvas.height = "500px";//window.innerHeight;
 		ctx.beginPath();
 		ctx.arc(circleX,circleY,circleRadius,0,2*Math.PI);
+		ctx.fillRect(circleX, circleY, 1, 1);
+		ctx.stroke();
 
-		
+		//draw the velocity
+		var length = 100;
+		var multiplier = getVelocityMultiplier(length);
+		ctx.beginPath()
+		ctx.moveTo(circleX,circleY);
+		ctx.lineTo(circleX + (circleVel.x * multiplier), circleY + (circleVel.y * multiplier));
+		ctx.stroke();
+
+		var indentLength = 5;
+		ctx.beginPath();
+		ctx.strokeStyle='#FF0000';
+		ctx.moveTo(circleX + circleVel.x - indentLength, circleY + circleVel.y);
+		ctx.lineTo(circleX + circleVel.x + indentLength, circleY + circleVel.y);
+		ctx.stroke();
+
+		ctx.beginPath();
+		ctx.strokeStyle='#000000';
+
+		var circleLine = {x1: circleX, y1: circleY, x2: circleX + circleVel.x, y2: circleY + circleVel.y};
+
+		lineSegments.forEach(function (line) {
+			ctx.moveTo (line.x1, line.y1);
+			ctx.lineTo (line.x2, line.y2);
+			ctx.stroke();
+
+			//Draw the bordering lines
+			ctx.beginPath();
+			ctx.strokeStyle='#00FFFF';
+			var perpedicularLines = perpendicularVector (vectorOfLine(line), circleRadius);	
+			var collisionLine1 = translateLine (line, perpedicularLines[0])
+			var collisionLine2 = translateLine (line, perpedicularLines[1])
+			ctx.moveTo (collisionLine1.x1, collisionLine1.y1);
+			ctx.lineTo (collisionLine1.x2, collisionLine1.y2);
+			ctx.moveTo (collisionLine2.x1, collisionLine2.y1);
+			ctx.lineTo (collisionLine2.x2, collisionLine2.y2);
+			ctx.stroke();
+
+			//Draw the intersecting points
+			ctx.beginPath();
+			//ctx.strokeStyle='#FF0000'; // red
+			var circleEndPoint = {
+				x : circleX + circleVel.x,
+				y :	circleY + circleVel.y
+			}
+			var interPoint1 = intersectionOfLines(circleLine, collisionLine1);
+			var interPoint2 = intersectionOfLines(circleLine, collisionLine2);
+			var collisionDistance1 = relativeDistanceBetweenPoints({x : circleX, y : circleY}, circleEndPoint, interPoint1);
+			var collisionDistance2 = relativeDistanceBetweenPoints({x : circleX, y : circleY}, circleEndPoint, interPoint2);
+
+			var closerCollisionPoint = null;
+			var fartherCollisionPoint = null;
+
+				//This is actually enough to check because if the distance would be negative, the collision won't happen anyways
+			if (Math.abs(collisionDistance1) < Math.abs(collisionDistance2)) {
+				closerCollisionPoint = interPoint1;
+				fartherCollisionPoint = interPoint2;
+			} else {
+				closerCollisionPoint = interPoint2;
+				fartherCollisionPoint = interPoint1;
+			}
+			if (closerCollisionPoint != null){
+				ctx.strokeStyle = '#00FF00'; // green
+				ctx.moveTo(closerCollisionPoint.x - indentLength, closerCollisionPoint.y);
+				ctx.lineTo(closerCollisionPoint.x + indentLength, closerCollisionPoint.y);
+				ctx.stroke();
+				ctx.beginPath();
+			}
+
+			if (fartherCollisionPoint != null){
+				ctx.strokeStyle='#FF0000'; // red
+				ctx.moveTo(fartherCollisionPoint.x - indentLength, fartherCollisionPoint.y);
+				ctx.lineTo(fartherCollisionPoint.x + indentLength, fartherCollisionPoint.y);
+				ctx.stroke();
+				ctx.beginPath();
+			}
+			/*
+			if (interPoint1 != null){
+				ctx.moveTo(interPoint1.x - indentLength, interPoint1.y);
+				ctx.lineTo(interPoint1.x + indentLength, interPoint1.y);
+			}
+			if (interPoint2 != null){
+				ctx.moveTo(interPoint2.x - indentLength, interPoint2.y);
+				ctx.lineTo(interPoint2.x + indentLength, interPoint2.y);
+			}
+			*/
+			ctx.stroke();
+
+			ctx.strokeStyle='#000000';
+			ctx.beginPath();
+		});
+
 		//ctx.stroke();
 		lines.forEach(function (line) {
 			ctx.moveTo (line.x1, line.y1);
 			ctx.lineTo (line.x2, line.y2);
 		});
 
-		lineSegments.forEach(function (line) {
-			ctx.moveTo (line.x1, line.y1);
-			ctx.lineTo (line.x2, line.y2);
-		});
+
 
 
 		points.forEach (function (point) {
@@ -36,12 +126,19 @@
 		x : 0.1,
 		y : 0.5
 	};
-	var circleRadius = 20;
+	var circleRadius = 10;
 	var prevTime = 0
 	var epsilon = 0.00001
 	var paused = false
-	function moveCircle(){
 
+	var pausedMode = false;
+	var debugMode = false;
+
+	var moveCounter = 0;
+	var lineSegmentCollisionCounter  = 0;
+	function moveCircle(){
+		//console.log ("moveCounter: " + moveCounter);
+		//moveCounter++;
 		var currentTime = Date.now();
 		var timeLeft = currentTime - prevTime;
 
@@ -60,12 +157,19 @@
 			
 			
 			lines.forEach (function (line) {
-				collision = collisionMin (collision, collisionDetectionLine (line, timeLeft));
+				collision = collisionMin (collision, collisionDetectionLineBorder (line, timeLeft));
 			})
 
 			//TODO: Add check to make sure the collision takes place on the line segment. Currently takes place on infinite line
 			lineSegments.forEach (function (line) {
 				collision = collisionMin (collision, collisionDetectionLineSegment (line, timeLeft));
+				
+				if (distanceFromPointToLine({x: circleX, y: circleY}, line).distance < 9){
+					console.log ("distance: " + distanceFromPointToLine({x: circleX, y: circleY}, line).distance)
+					console.log ("circle is WAY TOO CLOSE");
+					paused = true;
+					clearInterval (animation);
+				}
 			})
 	
 			
@@ -76,7 +180,11 @@
 			
 			//Note: currently only the lasts collision takes place, rather than the earliest
 			if (collision.shape != null) {
-				
+
+				if (pausedMode) {
+					paused = true;
+					clearInterval (animation);
+				}
 				//console.log (collision.time);
 				collision.collisionResponse (collision.shape, collision.time);
 
@@ -95,12 +203,22 @@
 			}
 
 
-			if (collisionCounter > 2) {
+			if (collisionCounter > 5) {
 				circleX+= circleVel.x*timeLeft;
 				circleY+= circleVel.y*timeLeft;
 				timeLeft = 0
 				clearInterval (animation);
 			}
+
+			lineSegments.forEach (function (line) {
+				
+				if (distanceFromPointToLine({x: circleX, y: circleY}, line).distance < 9.9){
+					console.log ("distance: " + distanceFromPointToLine({x: circleX, y: circleY}, line).distance)
+					console.log ("circle is WAY TOO CLOSE");
+					paused = true;
+					clearInterval (animation);
+				}
+			})
 			
 		}
 
@@ -128,7 +246,8 @@
 		paused = false;
 	}
 
-	function collisionDetectionLine (line, timeLeft) {
+//Currently checks both the vertical and the horizontal of the first point
+	function collisionDetectionLineBorder (line, timeLeft) {
 		var collision = {
 				time : Number.MAX_VALUE,
 				collisionResponse : {},
@@ -191,7 +310,7 @@
 			y :	circleY + circleVel.y * timeLeft
 		}
 
-		var result = distanceFromPointToLine ({x1 : circleX, y1 : circleY, x2 : circleEndPoint.x, y2 : circleEndPoint.y}, point)
+		var result = distanceFromPointToLine (point, {x1 : circleX, y1 : circleY, x2 : circleEndPoint.x, y2 : circleEndPoint.y})
 		var distance = result.distance;
 		var closestPoint = result.closestPoint;
 		//Check if collision is possible
@@ -267,7 +386,12 @@
 
 	}
 
+	//doesn't account for total skips
+	//doesn't account for line borders
 	function collisionDetectionLineSegment (line, timeLeft) {
+
+		//console.log ("lineSegmentCollisionCounter: " + lineSegmentCollisionCounter);
+		//lineSegmentCollisionCounter++;
 
 		var collision = {
 				time : Number.MAX_VALUE,
@@ -282,7 +406,7 @@
 			y :	circleY + circleVel.y * timeLeft
 		}
 
-		var perpedicularLines = perpendicularVector (vectorOfline(line), circleRadius);	
+		var perpedicularLines = perpendicularVector (vectorOfLine(line), circleRadius);	
 		var collisionLine1 = translateLine (line, perpedicularLines[0])
 		var collisionLine2 = translateLine (line, perpedicularLines[1])
 
@@ -293,11 +417,59 @@
 
 		if (collisionPoint1 != null && collisionPoint2 != null) {
 
+			
+
 			var distanceBetweenCollisionPoints = relativeDistanceBetweenPoints(collisionPoint1, collisionPoint2, circleEndPoint)
-			//if the circle is not intersecting the line segment
-			if (distanceBetweenCollisionPoints >= 0 && distanceBetweenCollisionPoints <= 1) {
+
+			if (debugMode){
+				var circleDistanceBetweenCollisionPoints = relativeDistanceBetweenPoints(collisionPoint1, collisionPoint2, {x: circleX, y : circleY});
+				if (circleDistanceBetweenCollisionPoints > 0 && circleDistanceBetweenCollisionPoints <= 1) {
+					console.log ("Circle crossing line");
+				}
+
+				if (isBetweenPoints (collisionPoint1, collisionPoint2, circleEndPoint)) {
+					console.log ("endpoint between end poitns");
+				}
+				if (isBetweenPoints (collisionPoint1, collisionPoint2, {x: circleX, y : circleY})) {
+					console.log ("circle point between end poitns");
+				}
+				//if the circle is not intersecting the line segment and is about to
+				if (distanceBetweenCollisionPoints >= 0 && distanceBetweenCollisionPoints < 1) {
+					console.log ("endpoint crossing line")
+				}
+			}
+
+			var collisionDistance1 = relativeDistanceBetweenPoints({x : circleX, y : circleY}, circleEndPoint, collisionPoint1);
+			var collisionDistance2 = relativeDistanceBetweenPoints({x : circleX, y : circleY}, circleEndPoint, collisionPoint2);
+			var closerCollisionPoint = null;
+			var fartherCollisionPoint = null;
+
+			//console.log ("dist1: " + collisionDistance1);
+			//console.log ("dist2: " + collisionDistance2);
+
+				//This is actually enough to check because if the distance would be negative, the collision won't happen anyways
+			if (Math.abs(collisionDistance1) < Math.abs(collisionDistance2)) {
+					closerCollisionPoint = collisionPoint1;
+					fartherCollisionPoint = collisionPoint2;
+			} else {
+				closerCollisionPoint = collisionPoint2;
+				fartherCollisionPoint = collisionPoint1;
+			}
+			var testCollisionPointDistance = relativeDistanceBetweenPoints(closerCollisionPoint, fartherCollisionPoint, circleEndPoint);
+			//console.log ("relDist: " + testCollisionPointDistance);
+			/*
+			if (testCollisionPointDistance > 1) {
+				console.log ("WAY PAST THE LINE");
+				paused = true;
+				clearInterval (animation);
+			}
+
+			if (distanceBetweenCollisionPoints >= 0 && distanceBetweenCollisionPoints < 1) {
+				*/
+			if (testCollisionPointDistance >= 0) {
 				var closerCollisionPoint = null;
 				var closerCollisionDistance = null;
+				var closerCollisionLine = null;
 
 				var collisionDistance1 = relativeDistanceBetweenPoints({x : circleX, y : circleY}, circleEndPoint, collisionPoint1);
 				var collisionDistance2 = relativeDistanceBetweenPoints({x : circleX, y : circleY}, circleEndPoint, collisionPoint2);
@@ -306,17 +478,33 @@
 				if (collisionDistance1 < collisionDistance2) {
 					closerCollisionPoint = collisionPoint1;
 					closerCollisionDistance = collisionDistance1;
+					closerCollisionLine = collisionLine1;
 				} else {
 					closerCollisionPoint = collisionPoint2;
 					closerCollisionDistance = collisionDistance2;
+					closerCollisionLine = collisionLine2;
 				}
+				var perpendCollisionVector = perpendicularVector (vectorOfLine (closerCollisionLine), circleRadius)[0]
+				var collisionPointOnLine = intersectionOfLines (line, lineOfTwoPoints (closerCollisionPoint, sumOfVectors (closerCollisionPoint, perpendCollisionVector)));
+				//console.log (lineOfTwoPoints (closerCollisionPoint, perpendicularVector (closerCollisionLine, 0)[0]));
+				//console.log (perpendicularVector(closerCollisionLine, 10)[0]);
+				//var perpendLines = perpendicularVector (vectorOfLine (closerCollisionLine), 10);
+				//console.log (perpendLines);
+				//console.log (perpendLines[0]);
 
+				//Debug with pausing at intersecting the line
+
+				var collisionDistanceOnLine = relativeDistanceBetweenPoints({x : line.x1, y : line.y1}, {x : line.x2, y : line.y2}, collisionPointOnLine);
+				//console.log (collisionPointOnLine);
 				//If the collision will happen within the time frame
-				if (closerCollisionDistance >= 0 && closerCollisionDistance <= 1) {
+				//if (closerCollisionDistance >= 0 && closerCollisionDistance <= 1 && collisionDistanceOnLine > 0 && collisionDistanceOnLine < 1) {
+				//if (closerCollisionDistance >= 0 && closerCollisionDistance <= 1) {
 					collision.time = scalarMultipleOfVector (circleVel, {x : circleX, y : circleY}, closerCollisionPoint);
 					collision.collisionResponse = collisionResponseLine
 					collision.shape = line;
-				}
+				//} else {
+				//	console.log ("Somehow doesn't collide?");
+				//}
 			}
 		}
 		return collision
@@ -326,7 +514,7 @@
 		console.log ("line segment collision");
 		circleX += circleVel.x * time
 		circleY += circleVel.y * time
-		var closerPointResult = distanceFromPointToLine (line, {x : circleX, y : circleY})
+		var closerPointResult = distanceFromPointToLine ({x : circleX, y : circleY}, line)
 		var closestPoint = closerPointResult.closestPoint;
 		collisionResponsePoint(closestPoint, 0);
 	}
@@ -340,6 +528,7 @@
 	}
 
 	//Point 1 and point2 represent a line segment
+	//1 means the lines are the same length
 	function scalarMultipleOfVector (vector, point1, point2) {
 		//Assert point2 - point1 = vector
 		var pointDiff = {
@@ -356,7 +545,7 @@
 	}
 
 	//returns both the closest point and the distance
-	function distanceFromPointToLine (line, point) {
+	function distanceFromPointToLine (point, line) {
 		//get Point of shortest distance
 		//First, find standard form of line
 		//y = mx + b -> 0 = mx - y + b
@@ -388,6 +577,13 @@
 
 	function distanceBetweenPoints (point1, point2) {
 		return Math.sqrt ((point2.x - point1.x)*(point2.x - point1.x) + (point2.y - point1.y)*(point2.y - point1.y))
+	}
+
+	function isBetweenPoints (point1, point2, targetPoint){
+		if (Math.abs(distanceBetweenPoints(point1, point2) - (distanceBetweenPoints(point1, targetPoint) + distanceBetweenPoints(point2, targetPoint))) < epsilon) {
+			return true;
+		}
+		return false;
 	}
 
 
@@ -433,12 +629,16 @@
 		return {x1 : line.x1 + translation.x, y1 : line.y1 + translation.y, x2 : line.x2 + translation.x, y2 : line.y2 + translation.y}
 	}
 
-	function vectorOfline (line) {
+	function vectorOfLine (line) {
 		return {x : line.x2 - line.x1, y : line.y2 - line.y1}
 	}
 
 	function vectorOfTwoPoints (point1, point2) {
 		return {x : point2.x - point1.x, y : point2.y - point1.y}
+	}
+
+	function lineOfTwoPoints (point1, point2) {
+		return {x1 : point1.x, y1 : point1.y, x2 : point2.x, y2 : point2.y};
 	}
 
 	function intersectionOfLines (line1, line2) {
@@ -456,6 +656,10 @@
 		return {x : (((x1 * y2) - (y1 * x2)) * (x3 - x4) - (x1 - x2) * ((x3 * y4) - (y3 * x4))) / denominator,
 				y : (((x1 * y2) - (y1 * x2)) * (y3 - y4) - (y1 - y2) * ((x3 * y4) - (y3 * x4))) / denominator}
 
+	}
+
+	function getVelocityMultiplier (length) {
+		return length / (Math.sqrt (circleVel.x * circleVel.x + circleVel.y * circleVel.y));
 	}
 
 	var points = [];
@@ -491,14 +695,23 @@
 
 
 	var testLine = {x1 : 200, y1 : 0, x2 : 250, y2 : height};
-	var perpedicularLines = perpendicularVector (vectorOfline(testLine), 50);
+	var perpedicularLines = perpendicularVector (vectorOfLine(testLine), 50);
 	console.log(perpedicularLines);
+	/*
+	lineSegments = [
+		{x1 : 130, y1 : height/2 - 130, x2 : 210, y2 : height/2 - 210},
+		{x1 : width/2, y1 : 0, x2 : width, y2 : height/2},
+		{x1 : width, y1 : height/2, x2 : width/2, y2 : height},
+		{x1 : width/2, y1 : height, x2 : 0, y2 : height/2}
+	];
+	*/
 	lineSegments = [
 		{x1 : 0, y1 : height/2, x2 : width/2, y2 : 0},
 		{x1 : width/2, y1 : 0, x2 : width, y2 : height/2},
 		{x1 : width, y1 : height/2, x2 : width/2, y2 : height},
 		{x1 : width/2, y1 : height, x2 : 0, y2 : height/2}
 	];
+	
 	
 /*
 	points = [
