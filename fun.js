@@ -37,6 +37,25 @@
 			
 		}
 
+		if (gridMode) {
+			ctx.beginPath();
+			ctx.strokeStyle = '#7CFC00'; // lawn green
+			gridLines.forEach (function (gridLine) {
+				if (gridLine.borderType == Border.Types.horizontal){
+					ctx.moveTo (0, gridLine.coord);
+					ctx.lineTo (ctx.canvas.width, gridLine.coord);
+				} else if (gridLine.borderType == Border.Types.vertical) {
+					ctx.moveTo (gridLine.coord, 0);
+					ctx.lineTo (gridLine.coord, ctx.canvas.height);
+				} else {
+					console.log ("undefined gridline")
+					console.log (gridLine.borderType);
+				}
+			});
+			ctx.stroke();
+		}
+
+		ctx.strokeStyle = '#000000'; // black
 		circles.forEach (function (circle) {
 			ctx.beginPath();
 			ctx.arc (circle.x,circle.y, circle.radius, 0, 2*Math.PI);
@@ -138,6 +157,20 @@
 			ctx.lineTo (line.x2, line.y2);
 		});
 
+		borderLines.forEach (function (borderLine) {
+			if (borderLine.borderType == Border.Types.horizontal){
+				ctx.moveTo (0, borderLine.coord);
+				ctx.lineTo (ctx.canvas.width, borderLine.coord);
+			} else if (borderLine.borderType == Border.Types.vertical) {
+				ctx.moveTo (borderLine.coord, 0);
+				ctx.lineTo (borderLine.coord, ctx.canvas.height);
+			} else {
+				console.log ("undefined border")
+				console.log (borderLine.borderType);
+			}
+			
+		})
+
 		//console.log ("points");
 		points.forEach (function (point) {
 			ctx.fillRect(point.x, point.y, 1, 1);
@@ -161,6 +194,7 @@
 
 	var pausedMode = false;
 	var debugMode = false;
+	var gridMode = true;
 
 	var moveCounter = 0;
 	var lineSegmentCollisionCounter  = 0;
@@ -186,7 +220,7 @@
 			
 			circles.forEach (function (circle){
 
-				lines.forEach (function (line) {
+				borderLines.forEach (function (line) {
 					collision = collisionMin (collision, collisionDetectionLineBorder (circle, line, timeLeft));
 				})
 
@@ -283,7 +317,7 @@
 	}
 
 //Currently checks both the vertical and the horizontal of the first point
-	function collisionDetectionLineBorder (circle, line, timeLeft) {
+	function collisionDetectionLineBorder (circle, borderLine, timeLeft) {
 		var collision = {
 				time : Number.MAX_VALUE,
 				collisionResponse : {},
@@ -291,47 +325,49 @@
 				circle : null
 			}
 	
-		//horizontal
-		var radiusOffset = line.x1 >= circle.x ? circle.radius : -circle.radius;
-		var collisionTimeX = (line.x1 - circle.x - radiusOffset) / circle.vel.x;
-		if (collisionTimeX >= 0 && collisionTimeX < timeLeft && collisionTimeX < collision.time) {
-			collision.time = collisionTimeX;
-			collision.collisionResponse = collisionResponseLineHorizontal
-			collision.shape = line;
-			collision.circle = circle;
-		}
-
-		//Vertical
-		radiusOffset = line.y1 >= circle.y ? circle.radius : -circle.radius;
-		var collisionTimeY = (line.y1 - circle.y - radiusOffset) / circle.vel.y;
-		if (collisionTimeY >= 0 && collisionTimeY < timeLeft && collisionTimeY < collision.time) {
-			collision.time = collisionTimeY;
-			collision.collisionResponse = collisionResponseLineVertical
-			collision.shape = line;
-			collision.circle = circle;
+		if (borderLine.borderType == Border.Types.vertical) {
+			//vertical lines
+			var radiusOffset = borderLine.coord >= circle.x ? circle.radius : -circle.radius;
+			var collisionTimeX = (borderLine.coord - circle.x - radiusOffset) / circle.vel.x;
+			if (collisionTimeX >= 0 && collisionTimeX < timeLeft && collisionTimeX < collision.time) {
+				collision.time = collisionTimeX;
+				collision.collisionResponse = collisionResponseLineVertical
+				collision.shape = borderLine;
+				collision.circle = circle;
+			}
+		} else if (borderLine.borderType === Border.Types.horizontal){
+			//Horizontal lines
+			radiusOffset = borderLine.coord >= circle.y ? circle.radius : -circle.radius;
+			var collisionTimeY = (borderLine.coord - circle.y - radiusOffset) / circle.vel.y;
+			if (collisionTimeY >= 0 && collisionTimeY < timeLeft && collisionTimeY < collision.time) {
+				collision.time = collisionTimeY;
+				collision.collisionResponse = collisionResponseLineHorizontal
+				collision.shape = borderLine;
+				collision.circle = circle;
+			}
 		}
 		return collision
 	}
 
-	function collisionResponseLineHorizontal (circle, line, time) {
+	function collisionResponseLineVertical(circle, line, time) {
 
 		
-		if (circle.x  >= line.x1) {
-			circle.x = line.x1 + circle.radius + 1;		
-		} else if (circle.x <= line.x1) {
-			circle.x = line.x1 - circle.radius - 1;		
+		if (circle.x  >= line.coord) {
+			circle.x = line.coord + circle.radius + 1;		
+		} else if (circle.x <= line.coord) {
+			circle.x = line.coord - circle.radius - 1;		
 		}
 		//circle.y+= circle.vel.y*time;		
 		circle.vel.x = -circle.vel.x;
 	}
 
-	function collisionResponseLineVertical (circle, line, time) {
+	function collisionResponseLineHorizontal (circle, line, time) {
 		//y coord
 		
-		if (circle.y  >= line.y1) {
-			circle.y = line.y1 + circle.radius + 1;		
-		} else if (circle.y <= line.y1) {
-			circle.y = line.y1 - circle.radius - 1;		
+		if (circle.y  >= line.coord) {
+			circle.y = line.coord + circle.radius + 1;		
+		} else if (circle.y <= line.coord) {
+			circle.y = line.coord - circle.radius - 1;		
 		}
 		//circle.x+= circle.vel.x*time;
 
@@ -688,18 +724,10 @@
 
 	var points = [];
 	var lines = [];
+	var borderLines = [];
+	var gridLines = [];
 	var circles = [];
 	var lineSegments = [];
-
-/*
-	var circle.x = 112;
-	var circle.y = 200;
-	var circleVel = {
-		x : 0.2,
-		y : 0.2
-	};
-	var circle.radius = 10;
-	*/
 
 	//moves the first circle
 	function setCirclePos (event) {
@@ -724,93 +752,83 @@
 		var height = ctx.canvas.height;
 
 		circles = [
-		new Circle (112, 200, 10, 0.2, 0.2),
-		new Circle (100,100, 10, 0.1, 0.03),
-		new Circle (300, 200, 10, 0.1, 0.04),
-		new Circle (400, 300, 30, 0.3, 0.2)
+		//new Circle (112, 200, 30, 0.2, 0.2),
+		//new Circle (100,100, 30, 0.1, 0.03),
+		//new Circle (300, 200, 30, 0.1, 0.04),
+		new Circle (450, 250, 30, -0.17, 0.2)
+		//new Circle (50, 150, 20, 0.1, 0.2)
 		];
-	lines = [
-	{x1 : 5, y1 : 0, x2 : 5, y2 : height},
-	{x1 : 0, y1 : 5, x2 : width, y2 : 5},
-	{x1 : width - 5, y1 : 0, x2 : width - 5, y2 : height},
-	{x1 : 0, y1 : height - 5, x2 : width, y2 : height - 5},
-	];
+		
+			/*
+		lines = [
+		{x1 : 5, y1 : 0, x2 : 5, y2 : height},
+		{x1 : 0, y1 : 5, x2 : width, y2 : 5},
+		{x1 : width - 5, y1 : 0, x2 : width - 5, y2 : height},
+		{x1 : 0, y1 : height - 5, x2 : width, y2 : height - 5},
+		];
+		*/
+		var gridSpace = 50;
+		for (var i = gridSpace; i <= width; i+= gridSpace) {
+			gridLines.push (new BorderLine (i, Border.Types.vertical));
+			gridLines.push (new BorderLine (i, Border.Types.horizontal));
+		}
 
+		borderLines = [
+			new BorderLine (5, Border.Types.vertical),
+			new BorderLine (width - 5, Border.Types.vertical),
+			new BorderLine (5, Border.Types.horizontal),
+			new BorderLine (height - 5, Border.Types.horizontal)
+		];
+		
 
-	var testLine = {x1 : 200, y1 : 0, x2 : 250, y2 : height};
-	var perpedicularLines = perpendicularVector (vectorOfLine(testLine), 50);
-	console.log(perpedicularLines);
-	
-	lineSegments = [
-		{x1 : 130, y1 : height/2 - 130, x2 : 210, y2 : height/2 - 210},
-		{x1 : 340, y1 : 60, x2: 440, y2: 160},
-		{x1 : 200, y1 : 400, x2: 300, y2: 400},
-		{x1 : 100, y1 : 250, x2: 140, y2: 400}
-	];
+		lineSegments = [
+			new LineSegment (130, height/2 - 130, 210, height/2 - 210),
+			new LineSegment (340, 60, 440, 160),
+			new LineSegment (200, 400, 300, 400),
+			new LineSegment (100, 250, 140, 400)
+		];
 
+			/*
+		lineSegments = [
+			{x1 : 130, y1 : height/2 - 130, x2 : 210, y2 : height/2 - 210},
+			{x1 : width/2, y1 : 0, x2 : width, y2 : height/2},
+			{x1 : width, y1 : height/2, x2 : width/2, y2 : height},
+			{x1 : width/2, y1 : height, x2 : 0, y2 : height/2},
+		];
+		*/
 		/*
-	lineSegments = [
-		{x1 : 130, y1 : height/2 - 130, x2 : 210, y2 : height/2 - 210},
-		{x1 : width/2, y1 : 0, x2 : width, y2 : height/2},
-		{x1 : width, y1 : height/2, x2 : width/2, y2 : height},
-		{x1 : width/2, y1 : height, x2 : 0, y2 : height/2},
-	];
-	*/
+		lineSegments = [
+			{x1 : 0, y1 : height/2, x2 : width/2, y2 : 0},
+			{x1 : width/2, y1 : 0, x2 : width, y2 : height/2},
+			{x1 : width, y1 : height/2, x2 : width/2, y2 : height},
+			{x1 : width/2, y1 : height, x2 : 0, y2 : height/2}
+		];
+		*/
+		
 	/*
-	lineSegments = [
-		{x1 : 0, y1 : height/2, x2 : width/2, y2 : 0},
-		{x1 : width/2, y1 : 0, x2 : width, y2 : height/2},
-		{x1 : width, y1 : height/2, x2 : width/2, y2 : height},
-		{x1 : width/2, y1 : height, x2 : 0, y2 : height/2}
-	];
-	*/
-	
-/*
-	points = [
-	{x : 100, y : 100},
-	{x : 200, y : 100},
-	{x : 300, y : 100},
-	{x : 400, y : 100},
+		points = [
+		{x : 100, y : 100},
+		{x : 200, y : 100},
+		{x : 300, y : 100},
+		{x : 400, y : 100},
 
-	{x : 100, y : 200},
-	{x : 200, y : 200},
-	{x : 300, y : 200},
-	{x : 400, y : 200},
+		{x : 100, y : 200},
+		{x : 200, y : 200},
+		{x : 300, y : 200},
+		{x : 400, y : 200},
 
-	{x : 100, y : 300},
-	{x : 200, y : 300},
-	{x : 300, y : 300},
-	{x : 400, y : 300},
+		{x : 100, y : 300},
+		{x : 200, y : 300},
+		{x : 300, y : 300},
+		{x : 400, y : 300},
 
-	{x : 100, y : 400},
-	{x : 200, y : 400},
-	{x : 300, y : 400},
-	{x : 400, y : 400}
-	];
-	*/
+		{x : 100, y : 400},
+		{x : 200, y : 400},
+		{x : 300, y : 400},
+		{x : 400, y : 400}
+		];
+		*/
 		console.log ("init header")
-
-/*
-		printAngle ({x : 1, y : 1}, {x : 1, y : 0});
-		printAngle ({x : -1, y : 1}, {x : 1, y : 0});
-		printAngle ({x : -1, y : -1}, {x : 1, y : 0});
-		printAngle ({x : 1, y : -1}, {x : 1, y : 0});
-
-		printAngle ({x : -1, y : -1}, {x : 1, y : 1});
-		printAngle ({x : 1, y : 1}, {x : -1, y : -1});
-
-		printAngle ({x : 1, y : 1}, {x : -1, y : 0});
-		*/
-		/*
-		var testVector = {x : 1, y : 1}
-		var zeroPoint = {x : 0, y : 0}
-		console.log ("some vector distances")
-		console.log (scalarMultipleOfVector(testVector, zeroPoint, {x : 1, y : 1}));
-		console.log (scalarMultipleOfVector(testVector, zeroPoint, {x : 2, y : 2}));
-		console.log (scalarMultipleOfVector(testVector, zeroPoint, {x : -0.5, y : -0.5}));
-		console.log (scalarMultipleOfVector(testVector, zeroPoint, {x : Math.PI, y : Math.PI}));
-		*/
-		//console.log (relativeDistanceBetweenPoints ({x : 1, y : 1}, {x : 2, y : 2}, {x : 4, y : 4}));
 	}
 
 	window.Window = {
