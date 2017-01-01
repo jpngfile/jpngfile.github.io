@@ -18,15 +18,16 @@
 		//ctx.stroke();
 		if (debugMode) {
 			//draw the velocity
+			var indentLength = 5;
 			var length = 100;
 			circles.forEach (function (circle){
-				var multiplier = getVelocityMultiplier(length);
+				var multiplier = getVelocityMultiplier(circle, length);
 				ctx.beginPath()
 				ctx.moveTo(circle.x,circle.y);
 				ctx.lineTo(circle.x + (circle.vel.x * multiplier), circle.y + (circle.vel.y * multiplier));
 				ctx.stroke();
 
-				var indentLength = 5;
+				
 
 				ctx.beginPath();
 				ctx.strokeStyle='#000000'; //black
@@ -89,7 +90,7 @@
 						x : circle.x + circle.vel.x,
 						y :	circle.y + circle.vel.y
 					}
-
+					var circleLine = {x1: circle.x, y1: circle.y, x2: circle.x + circle.vel.x, y2: circle.y + circle.vel.y};
 					//console.log ("get intersections");
 					var interPoint1 = intersectionOfLines(circleLine, collisionLine1);
 					var interPoint2 = intersectionOfLines(circleLine, collisionLine2);
@@ -187,14 +188,15 @@
 		})
 	}
 
-	
+	var timeSpeed = 30;
 	var prevTime = 0
 	var epsilon = 0.00001
 	var paused = false
 
+	var frameByFrameMode = false;
 	var pausedMode = false;
 	var debugMode = false;
-	var gridMode = true;
+	var gridMode = false;
 
 	var moveCounter = 0;
 	var lineSegmentCollisionCounter  = 0;
@@ -227,12 +229,32 @@
 				//TODO: Add check to make sure the collision takes place on the line segment. Currently takes place on infinite line
 				lineSegments.forEach (function (line) {
 					var lineCollision = collisionDetectionLineSegment (circle, line, timeLeft);
+					var point1Collision = collisionDetectionPoint(circle, {x: line.x1, y : line.y1}, timeLeft);
+					var point2Collision = collisionDetectionPoint(circle, {x: line.x2, y : line.y2}, timeLeft);
+					
+					/*
 					if (lineCollision.shape != null){
+						console.log ("line segment collision");
+						console.log (lineCollision.shape);
+						console.log (lineCollision.time);
+					}
+					if (point1Collision.shape != null){
+						console.log ("point1 segment collision");
+						console.log (point1Collision.shape);
+						console.log (point1Collision.time);
+					}
+					if (point2Collision.shape != null){
+						console.log ("point2 segment collision");
+						console.log (point2Collision.shape);
+						console.log (point2Collision.time);
+					}
+					*/
+					
+					//} else {
 						collision = collisionMin (collision, lineCollision);
-					} else {
 						collision = collisionMin (collision, collisionDetectionPoint(circle, {x: line.x2, y : line.y2}, timeLeft));
 						collision = collisionMin (collision, collisionDetectionPoint(circle, {x: line.x1, y : line.y1}, timeLeft));
-					}	
+					//}	
 				})
 		
 				
@@ -243,7 +265,7 @@
 
 				
 			//Note: currently only the lasts collision takes place, rather than the earliest
-			if (collision.shape != null) {
+			if (collision.shape != null && Math.abs (collision.time) <= timeLeft) {
 
 				if (pausedMode) {
 					paused = true;
@@ -283,6 +305,10 @@
 				timeLeft = 0
 				clearInterval (animation);
 			}
+			if (frameByFrameMode) {
+				paused = true;
+				clearInterval (animation);
+			}
 
 			
 			/*
@@ -312,7 +338,7 @@
 		c = document.getElementById("myCanvas");
 		ctx = c.getContext("2d");
 		prevTime = Date.now();
-		animation = setInterval(moveShapes, 50);
+		animation = setInterval(moveShapes, timeSpeed);
 		paused = false;
 	}
 
@@ -500,6 +526,7 @@
 
 			var distanceBetweenCollisionPoints = relativeDistanceBetweenPoints(collisionPoint1, collisionPoint2, circleEndPoint)
 
+			/*
 			if (debugMode){
 				var circleDistanceBetweenCollisionPoints = relativeDistanceBetweenPoints(collisionPoint1, collisionPoint2, {x: circle.x, y : circle.y});
 				if (circleDistanceBetweenCollisionPoints > 0 && circleDistanceBetweenCollisionPoints <= 1) {
@@ -517,6 +544,7 @@
 					console.log ("endpoint crossing line")
 				}
 			}
+			*/
 
 			var collisionDistance1 = relativeDistanceBetweenPoints({x : circle.x, y : circle.y}, circleEndPoint, collisionPoint1);
 			var collisionDistance2 = relativeDistanceBetweenPoints({x : circle.x, y : circle.y}, circleEndPoint, collisionPoint2);
@@ -557,8 +585,9 @@
 				//If the collision will happen within the time frame
 				//if (closerCollisionDistance >= 0 && closerCollisionDistance <= 1 && collisionDistanceOnLine > 0 && collisionDistanceOnLine < 1) {
 				//if (closerCollisionDistance >= 0 && closerCollisionDistance <= 1) {
-				if (collisionDistanceOnLine >= 0 && collisionDistanceOnLine <= 1) {
-					collision.time = scalarMultipleOfVector (circle.vel, {x : circle.x, y : circle.y}, closerCollisionPoint);
+				var collisionTime = scalarMultipleOfVector (circle.vel, {x : circle.x, y : circle.y}, closerCollisionPoint);
+				if (collisionDistanceOnLine >= 0 && collisionDistanceOnLine <= 1 && collisionTime >= 0) {
+					collision.time = collisionTime;
 					collision.collisionResponse = collisionResponseLine
 					collision.shape = line;
 					collision.circle = circle;
@@ -580,7 +609,7 @@
 	}
 
 	function collisionMin (collision1, collision2) {
-		if (collision1.time <= collision2.time) {
+		if (collision1.time <= collision2.time && collision2.time >= 0) {
 			return collision1
 		} else {
 			return collision2
@@ -718,7 +747,7 @@
 
 	}
 
-	function getVelocityMultiplier (length) {
+	function getVelocityMultiplier (circle, length) {
 		return length / (Math.sqrt (circle.vel.x * circle.vel.x + circle.vel.y * circle.vel.y));
 	}
 
@@ -752,11 +781,11 @@
 		var height = ctx.canvas.height;
 
 		circles = [
-		//new Circle (112, 200, 30, 0.2, 0.2),
-		//new Circle (100,100, 30, 0.1, 0.03),
-		//new Circle (300, 200, 30, 0.1, 0.04),
-		new Circle (450, 250, 30, -0.17, 0.2)
-		//new Circle (50, 150, 20, 0.1, 0.2)
+		new Circle (112, 200, 30, 0.2, 0.2),
+		new Circle (100,100, 30, 0.2, 0.3),
+		new Circle (300, 200, 30, 0.1, 0.04),
+		new Circle (450, 350, 30, -0.2, 0.1),
+		new Circle (50, 150, 20, 0.1, 0.2)
 		];
 		
 			/*
