@@ -188,7 +188,7 @@
 		})
 	}
 
-	var timeSpeed = 30;
+	var timeSpeed = 50;
 	var prevTime = 0
 	var epsilon = 0.00001
 	var paused = false
@@ -249,6 +249,7 @@
 						console.log (point2Collision.time);
 					}
 					*/
+					
 					
 					//} else {
 						collision = collisionMin (collision, lineCollision);
@@ -379,9 +380,9 @@
 
 		
 		if (circle.x  >= line.coord) {
-			circle.x = line.coord + circle.radius + 1;		
+			circle.x = line.coord + circle.radius + 0.01;		
 		} else if (circle.x <= line.coord) {
-			circle.x = line.coord - circle.radius - 1;		
+			circle.x = line.coord - circle.radius - 0.01;		
 		}
 		//circle.y+= circle.vel.y*time;		
 		circle.vel.x = -circle.vel.x;
@@ -391,9 +392,9 @@
 		//y coord
 		
 		if (circle.y  >= line.coord) {
-			circle.y = line.coord + circle.radius + 1;		
+			circle.y = line.coord + circle.radius + 0.01;		
 		} else if (circle.y <= line.coord) {
-			circle.y = line.coord - circle.radius - 1;		
+			circle.y = line.coord - circle.radius - 0.01;		
 		}
 		//circle.x+= circle.vel.x*time;
 
@@ -442,7 +443,7 @@
 
 			if (vectorDistanceToCollisionPoint >= 0 && vectorDistanceToCollisionPoint <= vectorDistanceToEndPoint) {
 				//collision.time = scalarMultipleOfVector ({x : circle.vel.x, y : circle.vel.y}, {x : circle.x, y : circle.y}, closerCollisionPoint);
-				collision.time = scalarMultipleOfVector (velocityUnitVector, {x : circle.x, y : circle.y}, closerCollisionPoint);
+				collision.time = scalarMultipleOfVector (circle.vel, {x : circle.x, y : circle.y}, closerCollisionPoint);
 				collision.collisionResponse = collisionResponsePoint;
 				collision.shape = point;
 				collision.circle = circle;
@@ -785,7 +786,7 @@
 		new Circle (100,100, 30, 0.2, 0.3),
 		new Circle (300, 200, 30, 0.1, 0.04),
 		new Circle (450, 350, 30, -0.2, 0.1),
-		new Circle (50, 150, 20, 0.1, 0.2)
+		new Circle (228, 450, 20, -0.005, 0.1)
 		];
 		
 			/*
