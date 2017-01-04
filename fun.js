@@ -1,6 +1,8 @@
 //TODO:
-//Add circle to list of possible circles
-//relative heights
+//Add still circle collision
+//Add moving circle collision
+//add moving point
+//add moving line segment
 
 (function (window,document){
 	'use strict';
@@ -179,6 +181,12 @@
 		
 		ctx.stroke();
 		//console.log ("end drawing");
+
+		stillCircles.forEach (function (circle) {
+			ctx.beginPath();
+			ctx.arc (circle.x,circle.y, circle.radius, 0, 2*Math.PI);
+			ctx.stroke();
+		})
 	}
 
 	function moveCircles(time) {
@@ -253,14 +261,22 @@
 					
 					//} else {
 						collision = collisionMin (collision, lineCollision);
-						collision = collisionMin (collision, collisionDetectionPoint(circle, {x: line.x2, y : line.y2}, timeLeft));
-						collision = collisionMin (collision, collisionDetectionPoint(circle, {x: line.x1, y : line.y1}, timeLeft));
+						collision = collisionMin (collision, point1Collision);
+						collision = collisionMin (collision, point2Collision);
 					//}	
 				})
 		
 				
-				points.forEach ( function (point) {
+				points.forEach (function (point) {
 					collision = collisionMin (collision, collisionDetectionPoint (circle, point, timeLeft));
+				})
+
+				stillCircles.forEach (function (stillCircle) {
+					var circleCollision = collisionDetectionPoint (circle, stillCircle, timeLeft, stillCircle.radius);
+					if (circleCollision.shape != null) {
+						console.log ("Collided with circle");
+						collision = collisionMin (collision, circleCollision);
+					}
 				})
 			})
 
@@ -401,7 +417,7 @@
 		circle.vel.y = -circle.vel.y;
 	}
 
-	function collisionDetectionPoint(circle, point, timeLeft) {
+	function collisionDetectionPoint(circle, point, timeLeft, radius = 0) {
 
 		var collision = {
 			time : Number.MAX_VALUE,
@@ -420,9 +436,9 @@
 		var distance = result.distance;
 		var closestPoint = result.closestPoint;
 		//Check if collision is possible
-		if (circle.radius >= distance) {
+		if (circle.radius + radius >= distance) {
 			//Get distance from closest point to collision point
-			var distanceFromClosestPoint = Math.sqrt (Math.pow (circle.radius, 2) - Math.pow (distance, 2));
+			var distanceFromClosestPoint = Math.sqrt (Math.pow (circle.radius + radius, 2) - Math.pow (distance, 2));
 			//Find the collision point
 			//Get unit vector for circle velocity
 			var velocityMag = Math.sqrt (Math.pow (circle.vel.x, 2) + Math.pow (circle.vel.y, 2));
@@ -444,7 +460,7 @@
 			if (vectorDistanceToCollisionPoint >= 0 && vectorDistanceToCollisionPoint <= vectorDistanceToEndPoint) {
 				//collision.time = scalarMultipleOfVector ({x : circle.vel.x, y : circle.vel.y}, {x : circle.x, y : circle.y}, closerCollisionPoint);
 				collision.time = scalarMultipleOfVector (circle.vel, {x : circle.x, y : circle.y}, closerCollisionPoint);
-				collision.collisionResponse = collisionResponsePoint;
+				collision.collisionResponse = radius === 0 ? collisionResponsePoint : collisionResponseStillCircle;
 				collision.shape = point;
 				collision.circle = circle;
 			}
@@ -491,6 +507,13 @@
 		circle.vel.x = newVelX;
 		circle.vel.y = newVelY;
 
+	}
+
+	function collisionResponseStillCircle (circle, stillCircle, timeLeft){
+		var collisionVector = vectorOfTwoPoints ({x : circle.x, y : circle.y}, {x : stillCircle.x, y : stillCircle.y});
+		var vectorToCollisionPoint = multiplyVectorByScalar (unitVector (collisionVector), circle.radius);
+		var collisionPoint = sumOfVectors ({x : circle.x, y : circle.y}, vectorToCollisionPoint);
+		collisionResponsePoint(circle, collisionPoint, 0);
 	}
 
 	function collisionDetectionLineSegment (circle, line, timeLeft) {
@@ -752,11 +775,22 @@
 		return length / (Math.sqrt (circle.vel.x * circle.vel.x + circle.vel.y * circle.vel.y));
 	}
 
+	//Doesn't work for vectors with zero magnitude
+	function unitVector (vector) {
+		var vectorMag = Math.sqrt (Math.pow (vector.x, 2) + Math.pow (vector.y, 2));
+		var vectorUnitVector = {
+				x : vector.x / vectorMag,
+				y : vector.y / vectorMag
+		}
+		return vectorUnitVector;
+	}
+
 	var points = [];
 	var lines = [];
 	var borderLines = [];
 	var gridLines = [];
 	var circles = [];
+	var stillCircles = [];
 	var lineSegments = [];
 
 	//moves the first circle
@@ -788,15 +822,11 @@
 		new Circle (450, 350, 30, -0.2, 0.1),
 		new Circle (228, 450, 20, -0.005, 0.1)
 		];
-		
-			/*
-		lines = [
-		{x1 : 5, y1 : 0, x2 : 5, y2 : height},
-		{x1 : 0, y1 : 5, x2 : width, y2 : 5},
-		{x1 : width - 5, y1 : 0, x2 : width - 5, y2 : height},
-		{x1 : 0, y1 : height - 5, x2 : width, y2 : height - 5},
-		];
-		*/
+
+		stillCircles = [
+		new Circle (250,250, 40, 0, 0)
+		]
+
 		var gridSpace = 50;
 		for (var i = gridSpace; i <= width; i+= gridSpace) {
 			gridLines.push (new BorderLine (i, Border.Types.vertical));
@@ -810,22 +840,15 @@
 			new BorderLine (height - 5, Border.Types.horizontal)
 		];
 		
-
+		/*
 		lineSegments = [
 			new LineSegment (130, height/2 - 130, 210, height/2 - 210),
 			new LineSegment (340, 60, 440, 160),
 			new LineSegment (200, 400, 300, 400),
 			new LineSegment (100, 250, 140, 400)
 		];
-
-			/*
-		lineSegments = [
-			{x1 : 130, y1 : height/2 - 130, x2 : 210, y2 : height/2 - 210},
-			{x1 : width/2, y1 : 0, x2 : width, y2 : height/2},
-			{x1 : width, y1 : height/2, x2 : width/2, y2 : height},
-			{x1 : width/2, y1 : height, x2 : 0, y2 : height/2},
-		];
 		*/
+
 		/*
 		lineSegments = [
 			{x1 : 0, y1 : height/2, x2 : width/2, y2 : 0},
