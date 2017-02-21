@@ -7,6 +7,7 @@ function Circle (x, y, radius, velX, velY) {
 		x : velX,
 		y: velY
 	};
+	this.area = function () {return Math.PI * Math.pow (this.radius, 2);}
 }
 
 var Border = {};
