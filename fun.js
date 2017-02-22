@@ -185,10 +185,20 @@
 			ctx.arc (circle.x,circle.y, circle.radius, 0, 2*Math.PI);
 			ctx.stroke();
 		})
+
+		stableCircles.forEach (function (circle) {
+			ctx.beginPath();
+			ctx.arc (circle.x,circle.y, circle.radius, 0, 2*Math.PI);
+			ctx.stroke();
+		})
 	}
 
 	function moveCircles(time) {
 		circles.forEach (function (circle){
+			circle.x+= circle.vel.x*time;
+			circle.y+= circle.vel.y*time;
+		})
+		stableCircles.forEach (function (circle){
 			circle.x+= circle.vel.x*time;
 			circle.y+= circle.vel.y*time;
 		})
@@ -225,6 +235,11 @@
 				shape : null,
 				circle: null
 			}
+			stableCircles.forEach (function (circle) {
+				borderLines.forEach (function (line) {
+					collision = collisionMin (collision, collisionDetectionLineBorder (circle, line, timeLeft));
+				})
+			});
 			
 			circles.forEach (function (circle){
 
@@ -275,6 +290,16 @@
 						collision = collisionMin (collision, circleCollision);
 					}
 				})
+
+
+				stableCircles.forEach (function (stableCircle) {
+					var circleCollision = collisionDetectionMovingCircle (circle, stableCircle, timeLeft)
+					if (circleCollision.shape != null) {
+						//console.log ("Collided with circle");
+						collision = collisionMin (collision, circleCollision);
+					}
+				})
+
 
 				circles.forEach (function (otherCircle) {
 					if (circle !== otherCircle) {
@@ -373,6 +398,7 @@
 	var gridLines = [];
 	var circles = [];
 	var stillCircles = [];
+	var stableCircles = [];
 	var lineSegments = [];
 
 	//moves the first circle
@@ -399,14 +425,20 @@
 
 		circles = [
 		new Circle (112, 200, 30, 0.2, 0.2),
-		new Circle (100,100, 30, 0.2, 0.3),
-		new Circle (300, 200, 30, 0.1, 0.04),
-		new Circle (450, 350, 30, -0.2, 0.1),
-		new Circle (228, 450, 20, -0.005, 0.1)
+		//new Circle (100,100, 30, 0.2, 0.3),
+		//new Circle (300, 200, 30, 0.1, 0.04),
+		//new Circle (450, 350, 30, -0.2, 0.1),
+		//new Circle (228, 450, 20, -0.005, 0.1)
 		];
 
+		/*
 		stillCircles = [
 			new Circle (250,250, 40, 0, 0)
+		]
+		*/
+
+		stableCircles = [
+			new StableCircle (250,250, 40, 0.1, 0)
 		]
 
 		var gridSpace = 50;
@@ -422,14 +454,14 @@
 			new BorderLine (height - 5, Border.Types.horizontal)
 		];
 		
-		
+		/*
 		lineSegments = [
 			new LineSegment (130, height/2 - 130, 210, height/2 - 210),
 			new LineSegment (340, 60, 440, 160),
 			new LineSegment (200, 400, 300, 400),
 			new LineSegment (100, 250, 140, 400)
 		];
-		
+		*/
 
 		/*
 		lineSegments = [

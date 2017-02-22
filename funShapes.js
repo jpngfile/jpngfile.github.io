@@ -7,9 +7,15 @@ function Circle (x, y, radius, velX, velY) {
 		x : velX,
 		y: velY
 	};
-	//this.area = function () {return Math.PI * Math.pow (this.radius, 2);}
-	this.area = function () {return this.radius;}
+	this.area = function () {return Math.PI * Math.pow (this.radius, 2);}
+	//this.area = function () {return this.radius;}
 	this.center = function() {return new Point (this.x, this.y);}
+	this.isStable = false;
+}
+
+function StableCircle (x, y, radius, velX, velY) {
+	Circle.call (this, x, y, radius, velX, velY);
+	this.isStable = true;
 }
 
 var Border = {};

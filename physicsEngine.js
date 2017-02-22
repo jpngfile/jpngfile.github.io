@@ -143,13 +143,18 @@ function collisionResponseMovingCircle (circle1, circle2, timeLeft) {
 	var newCircleVel1 = rotateVector(circle1.vel, angle);
 	var newCircleVel2 = rotateVector(circle2.vel, angle);
 
-	var massDiff = circle1.area() - circle2.area();
-	var massSum = circle1.area() + circle2.area();
-	var newX1 = (massDiff / massSum)* newCircleVel1.x + (2 * circle2.area() / massSum) * newCircleVel2.x;
-	var newX2 = (2 * circle1.area() / massSum) * newCircleVel1.x + (massDiff / massSum) * newCircleVel2.x;
+	if (circle2.isStable) {
+		newCircleVel1.x *= -1;
+		newCircleVel1.x += 2*newCircleVel2.x;
+	} else {
+		var massDiff = circle1.area() - circle2.area();
+		var massSum = circle1.area() + circle2.area();
+		var newX1 = (massDiff / massSum)* newCircleVel1.x + (2 * circle2.area() / massSum) * newCircleVel2.x;
+		var newX2 = (2 * circle1.area() / massSum) * newCircleVel1.x + (massDiff / massSum) * newCircleVel2.x;
 
-	newCircleVel1.x = newX1;
-	newCircleVel2.x = newX2;
+		newCircleVel1.x = newX1;
+		newCircleVel2.x = newX2;
+	}
 
 	circle1.vel = rotateVector(newCircleVel1, -angle);
 	circle2.vel = rotateVector(newCircleVel2, -angle);
