@@ -232,7 +232,6 @@
 					collision = collisionMin (collision, collisionDetectionLineBorder (circle, line, timeLeft));
 				})
 
-				//TODO: Add check to make sure the collision takes place on the line segment. Currently takes place on infinite line
 				lineSegments.forEach (function (line) {
 					var lineCollision = collisionDetectionLineSegment (circle, line, timeLeft);
 					var point1Collision = collisionDetectionPoint(circle, new Point (line.x1, line.y1), timeLeft);

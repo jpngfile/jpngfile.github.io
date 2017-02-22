@@ -8,21 +8,11 @@ function collisionMin (collision1, collision2) {
 }
 
 function rotateVector (vector, angle) {
-	//var angle = Math.atan2(vector, );
-
 	//var angleInDegrees = angle * (180 / Math.PI);
 	//console.log (angleInDegrees);
 
-	/*
-	console.log (collisionVector);
-	console.log ({x : circle.vel.x, y : circle.vel.y});
-	console.log (angleInDegrees);
-	*/
-
-	//angle is always < Math.PI, so rotationAngle > 0
-	var rotationAngle = angle
-	var cosAngle = Math.cos (rotationAngle);
-	var sinAngle = Math.sin (rotationAngle);
+	var cosAngle = Math.cos (angle);
+	var sinAngle = Math.sin (angle);
 	//Rotate the velocity vector
 	/*
 		CCW rotation matrix

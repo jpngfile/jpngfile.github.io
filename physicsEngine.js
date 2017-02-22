@@ -8,11 +8,6 @@ function collisionDetectionLineBorder (circle, borderLine, timeLeft) {
 		var radiusOffset = borderLine.coord >= circle.x ? circle.radius : -circle.radius;
 		var collisionTimeX = (borderLine.coord - circle.x - radiusOffset) / circle.vel.x;
 		if (collisionTimeX >= 0 && collisionTimeX < timeLeft && collisionTimeX < collision.time) {
-			/*collision.time = collisionTimeX;
-			collision.collisionResponse = collisionResponseLineVertical
-			collision.shape = borderLine;
-			collision.circle = circle;
-			*/
 			collision = new Collision (collisionTimeX, collisionResponseLineVertical, borderLine, circle);
 		}
 	} else if (borderLine.borderType === Border.Types.horizontal){
@@ -20,11 +15,6 @@ function collisionDetectionLineBorder (circle, borderLine, timeLeft) {
 		radiusOffset = borderLine.coord >= circle.y ? circle.radius : -circle.radius;
 		var collisionTimeY = (borderLine.coord - circle.y - radiusOffset) / circle.vel.y;
 		if (collisionTimeY >= 0 && collisionTimeY < timeLeft && collisionTimeY < collision.time) {
-			/*collision.time = collisionTimeY;
-			collision.collisionResponse = collisionResponseLineHorizontal
-			collision.shape = borderLine;
-			collision.circle = circle;
-			*/
 			collision = new Collision (collisionTimeY, collisionResponseLineHorizontal, borderLine, circle);
 		}
 	}
@@ -39,7 +29,7 @@ function collisionResponseLineVertical(circle, line, time) {
 	} else if (circle.x <= line.coord) {
 		circle.x = line.coord - circle.radius - 0.01;		
 	}
-	//circle.y+= circle.vel.y*time;		
+	
 	circle.vel.x = -circle.vel.x;
 }
 
@@ -51,7 +41,6 @@ function collisionResponseLineHorizontal (circle, line, time) {
 	} else if (circle.y <= line.coord) {
 		circle.y = line.coord - circle.radius - 0.01;		
 	}
-	//circle.x+= circle.vel.x*time;
 
 	circle.vel.y = -circle.vel.y;
 }
@@ -65,13 +54,8 @@ function collisionDetectionPoint(circle, point, timeLeft, radius = 0) {
 		circle.x + circle.vel.x * timeLeft,
 		circle.y + circle.vel.y * timeLeft
 	)
-	/*{
-		x : circle.x + circle.vel.x * timeLeft,
-		y :	circle.y + circle.vel.y * timeLeft
-	}*/
 
 	var result = distanceFromPointToLine (point, new LineSegment (circle.x, circle.y, circleEndPoint.x, circleEndPoint.y));
-		//{x1 : circle.x, y1 : circle.y, x2 : circleEndPoint.x, y2 : circleEndPoint.y})
 	var distance = result.distance;
 	var closestPoint = result.closestPoint;
 	//Check if collision is possible
@@ -85,10 +69,6 @@ function collisionDetectionPoint(circle, point, timeLeft, radius = 0) {
 			circle.vel.x / velocityMag,
 			circle.vel.y / velocityMag
 		);
-		/*{
-			x : circle.vel.x / velocityMag,
-			y : circle.vel.y / velocityMag
-		}*/
 
  		  var closerCollisionPoint = new Point (
  		  	closestPoint.x - velocityUnitVector.x * distanceFromClosestPoint,
@@ -102,13 +82,6 @@ function collisionDetectionPoint(circle, point, timeLeft, radius = 0) {
 		var vectorDistanceToCollisionPoint = scalarMultipleOfVector (circle.vel, circle.center(), closerCollisionPoint);
 
 		if (vectorDistanceToCollisionPoint >= 0 && vectorDistanceToCollisionPoint <= vectorDistanceToEndPoint) {
-			//collision.time = scalarMultipleOfVector ({x : circle.vel.x, y : circle.vel.y}, {x : circle.x, y : circle.y}, closerCollisionPoint);
-			
-			/*collision.time = scalarMultipleOfVector (circle.vel, {x : circle.x, y : circle.y}, closerCollisionPoint);
-			collision.collisionResponse = radius === 0 ? collisionResponsePoint : collisionResponseStillCircle;
-			collision.shape = point;
-			collision.circle = circle;
-			*/
 			collision = new Collision (scalarMultipleOfVector (circle.vel, circle.center(), closerCollisionPoint),
 									   radius === 0 ? collisionResponsePoint : collisionResponseStillCircle, 
 									   point, circle);
@@ -122,8 +95,6 @@ function collisionDetectionPoint(circle, point, timeLeft, radius = 0) {
 
 function collisionResponsePoint (circle, point, time) {
 	//console.log ("point collision");
-	//circle.x += circle.vel.x * time
-	//circle.y += circle.vel.y * time
 	var collisionVector = new Vector (
 		circle.x - point.x,
 		circle.y - point.y
@@ -134,33 +105,10 @@ function collisionResponsePoint (circle, point, time) {
 
 	//var angleInDegrees = angle * (180 / Math.PI);
 
-	/*
-	console.log (collisionVector);
-	console.log ({x : circle.vel.x, y : circle.vel.y});
-	console.log (angleInDegrees);
-	*/
-
 	//angle is always < Math.PI, so rotationAngle > 0
 	var rotationAngle = -(Math.PI - 2*angle)
 
-	/*
-	var cosAngle = Math.cos (rotationAngle);
-	var sinAngle = Math.sin (rotationAngle);
-	*/
-	//Rotate the velocity vector
-	/*
-		CCW rotation matrix
-		R (theta) =	[cos (theta)  -sin(theta)]
-					[sin (theta)  cos(theta)]
-	*/
-	//var newVelX = circle.vel.x * cosAngle - circle.vel.y * sinAngle;
-	//var newVelY = circle.vel.x * sinAngle + circle.vel.y * cosAngle;
-	var newVel = rotateVector (circle.vel, rotationAngle);
-
-	circle.vel = newVel;
-	//circle.vel.x = newVelX;
-	//circle.vel.y = newVelY;
-
+	circle.vel = rotateVector (circle.vel, rotationAngle);
 }
 
 function collisionResponseStillCircle (circle, stillCircle, timeLeft){
@@ -181,7 +129,9 @@ function collisionDetectionMovingCircle (circle1, circle2, timeLeft) {
 	return relativeCollision;
 }
 
-//This is totally wrong. Will have to learn 2D elastic collision to fix
+//Rotates the velocity vectors to be perpendicular with collision
+//rotated y components stay the same since they are parallel
+//problem is reduced to one dimension collision for rotated x components
 function collisionResponseMovingCircle (circle1, circle2, timeLeft) {
 	var collisionVector = vectorOfTwoPoints (circle1.center(), circle2.center());
 	var normalVector = rotateVector(collisionVector, Math.PI / 2);
@@ -192,9 +142,6 @@ function collisionResponseMovingCircle (circle1, circle2, timeLeft) {
 
 	var newCircleVel1 = rotateVector(circle1.vel, angle);
 	var newCircleVel2 = rotateVector(circle2.vel, angle);
-
-	//circle1.vel = newCircleVel1
-	//circle2.vel = newCircleVel2
 
 	var massDiff = circle1.area() - circle2.area();
 	var massSum = circle1.area() + circle2.area();
@@ -224,7 +171,6 @@ function collisionDetectionLineSegment (circle, line, timeLeft) {
 	var collisionLine1 = translateLine (line, perpedicularLines[0])
 	var collisionLine2 = translateLine (line, perpedicularLines[1])
 
-	//var circleVelLine = {x1 : circle.x, y1 : circle.y, x2 : circleEndPoint.x , y2 : circleEndPoint.y}
 	circleVelLine = new LineSegment (circle.x, circle.y, circleEndPoint.x, circleEndPoint.y);
 
 	var collisionPoint1 = intersectionOfLines(circleVelLine, collisionLine1);
@@ -266,7 +212,7 @@ function collisionDetectionLineSegment (circle, line, timeLeft) {
 		//console.log ("dist1: " + collisionDistance1);
 		//console.log ("dist2: " + collisionDistance2);
 
-			//This is actually enough to check because if the distance would be negative, the collision won't happen anyways
+		//This is actually enough to check because if the distance would be negative, the collision won't happen anyways
 		if (Math.abs(collisionDistance1) < Math.abs(collisionDistance2)) {
 				closerCollisionPoint = collisionPoint1;
 				closerCollisionDistance = collisionDistance1;
@@ -297,11 +243,6 @@ function collisionDetectionLineSegment (circle, line, timeLeft) {
 			//if (closerCollisionDistance >= 0 && closerCollisionDistance <= 1) {
 			var collisionTime = scalarMultipleOfVector (circle.vel, circle.center(), closerCollisionPoint);
 			if (collisionDistanceOnLine >= 0 && collisionDistanceOnLine <= 1 && collisionTime >= 0) {
-				/*collision.time = collisionTime;
-				collision.collisionResponse = collisionResponseLine
-				collision.shape = line;
-				collision.circle = circle;
-				*/
 				collision = new Collision (collisionTime, collisionResponseLine, line, circle);
 			} else {
 				//console.log ("collides outside the line segment");
@@ -313,8 +254,6 @@ function collisionDetectionLineSegment (circle, line, timeLeft) {
 
 function collisionResponseLine (circle, line, time) {
 	//console.log ("line segment collision");
-	//circle.x += circle.vel.x * time
-	//circle.y += circle.vel.y * time
 	var closerPointResult = distanceFromPointToLine (circle.center(), line)
 	var closestPoint = closerPointResult.closestPoint;
 	collisionResponsePoint(circle, closestPoint, 0);
