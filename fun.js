@@ -424,7 +424,8 @@
 		var height = ctx.canvas.height;
 
 		circles = [
-		new Circle (112, 200, 30, 0.2, 0.2),
+		new Circle (200, 240, 30, 0, 0),
+		//new Circle (112, 200, 30, 0.2, 0.2),
 		//new Circle (100,100, 30, 0.2, 0.3),
 		//new Circle (300, 200, 30, 0.1, 0.04),
 		//new Circle (450, 350, 30, -0.2, 0.1),

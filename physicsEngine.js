@@ -145,7 +145,10 @@ function collisionResponseMovingCircle (circle1, circle2, timeLeft) {
 
 	if (circle2.isStable) {
 		newCircleVel1.x *= -1;
-		newCircleVel1.x += 2*newCircleVel2.x;
+		//if they're moving in opposite directions
+		if (newCircleVel1.x * newCircleVel2.x >= 0) {
+			newCircleVel1.x += 2*newCircleVel2.x;
+		}
 	} else {
 		var massDiff = circle1.area() - circle2.area();
 		var massSum = circle1.area() + circle2.area();
