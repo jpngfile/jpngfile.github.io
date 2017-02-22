@@ -7,7 +7,9 @@ function Circle (x, y, radius, velX, velY) {
 		x : velX,
 		y: velY
 	};
-	this.area = function () {return Math.PI * Math.pow (this.radius, 2);}
+	//this.area = function () {return Math.PI * Math.pow (this.radius, 2);}
+	this.area = function () {return this.radius;}
+	this.center = function() {return new Point (this.x, this.y);}
 }
 
 var Border = {};
@@ -26,4 +28,21 @@ function LineSegment (x1, y1, x2, y2) {
 	this.y1 = y1;
 	this.x2 = x2;
 	this.y2 = y2;
+}
+
+function Vector (x, y) {
+	this.x = x;
+	this.y = y;
+}
+
+function Point (x, y) {
+	this.x = x; 
+	this.y = y;
+}
+
+function Collision (time = Number.MAX_VALUE, collisionResponse = {}, shape = null, circle = null) {
+	this.time = time;
+	this.collisionResponse = collisionResponse;
+	this.shape = shape;
+	this.circle = circle;
 }

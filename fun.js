@@ -1,5 +1,4 @@
 //TODO:
-//Add moving circle collision
 //add moving point
 //add moving line segment
 
@@ -236,8 +235,8 @@
 				//TODO: Add check to make sure the collision takes place on the line segment. Currently takes place on infinite line
 				lineSegments.forEach (function (line) {
 					var lineCollision = collisionDetectionLineSegment (circle, line, timeLeft);
-					var point1Collision = collisionDetectionPoint(circle, {x: line.x1, y : line.y1}, timeLeft);
-					var point2Collision = collisionDetectionPoint(circle, {x: line.x2, y : line.y2}, timeLeft);
+					var point1Collision = collisionDetectionPoint(circle, new Point (line.x1, line.y1), timeLeft);
+					var point2Collision = collisionDetectionPoint(circle, new Point (line.x2, line.y2), timeLeft);
 					
 					/*
 					if (lineCollision.shape != null){
@@ -408,7 +407,7 @@
 		];
 
 		stillCircles = [
-		//new Circle (250,250, 40, 0, 0)
+			new Circle (250,250, 40, 0, 0)
 		]
 
 		var gridSpace = 50;
@@ -424,14 +423,14 @@
 			new BorderLine (height - 5, Border.Types.horizontal)
 		];
 		
-		/*
+		
 		lineSegments = [
 			new LineSegment (130, height/2 - 130, 210, height/2 - 210),
 			new LineSegment (340, 60, 440, 160),
 			new LineSegment (200, 400, 300, 400),
 			new LineSegment (100, 250, 140, 400)
 		];
-		*/
+		
 
 		/*
 		lineSegments = [

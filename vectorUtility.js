@@ -31,7 +31,7 @@ function rotateVector (vector, angle) {
 	*/
 	var newVecX = vector.x * cosAngle - vector.y * sinAngle;
 	var newVecY = vector.x * sinAngle + vector.y * cosAngle;
-	return {x : newVecX, y : newVecY};
+	return new Vector(newVecX, newVecY)
 }
 
 //Point 1 and point2 represent a line segment
