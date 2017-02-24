@@ -21,6 +21,62 @@ function collisionDetectionLineBorder (circle, borderLine, timeLeft) {
 	return collision;
 }
 
+function collisionDetectionMovingLineSegmentLineBorder (lineSegment, borderLine, timeLeft) {
+	var collision1 = collisionDetectionLineBorder (new Circle (lineSegment.x1, lineSegment.y1, 0, 
+													lineSegment.vel.x, lineSegment.vel.y), borderLine, timeLeft);
+	var collision2 = collisionDetectionLineBorder (new Circle (lineSegment.x2, lineSegment.y2, 0, 
+													lineSegment.vel.x, lineSegment.vel.y), borderLine, timeLeft);
+	var earliestCollision = collisionMin (collision1, collision2);
+	if (earliestCollision.shape != null) {
+		earliestCollision.circle = lineSegment;
+		earliestCollision.collisionResponse = earliestCollision.collisionResponse == collisionResponseLineHorizontal ?
+											collisionResponseLineSegmentLineHorizontal : collisionResponseLineSegmentLineVertical;
+	}
+	return earliestCollision;
+}
+
+function collisionResponseLineSegmentLineVertical(lineSegment, line, time) {
+
+	var diff = 0;
+	var colX = 0
+	if (lineSegment.vel.x > 0) {
+		colX = Math.max (lineSegment.x1, lineSegment.x2);
+	} else {
+		colX = Math.min (lineSegment.x1, lineSegment.x2);
+	}
+	if (lineSegment.vel.x > 0) {
+		diff = (line.coord - 0.01) - colX;
+		
+	} else if (lineSegment.vel.x < 0) {
+		diff = (line.coord + 0.01) - colX;		
+	}
+	lineSegment.x1+= diff;
+	lineSegment.x2+= diff;	
+	
+	lineSegment.vel.x = -lineSegment.vel.x;
+}
+
+function collisionResponseLineSegmentLineHorizontal (lineSegment, line, time) {
+	//y coord
+	var diff = 0;
+	var colY = 0
+	if (lineSegment.vel.y > 0) {
+		colY = Math.max (lineSegment.y1, lineSegment.y2);
+	} else {
+		colY = Math.min (lineSegment.y1, lineSegment.y2);
+	}
+	if (lineSegment.vel.y > 0) {
+		diff = line.coord - 0.01 - colY
+		
+	} else if (lineSegment.vel.y < 0) {
+		diff = line.coord + 0.01 - colY;		
+	}
+	lineSegment.y1+= diff;
+	lineSegment.y2+= diff;	
+	
+	lineSegment.vel.y = -lineSegment.vel.y;
+}
+
 function collisionResponseLineVertical(circle, line, time) {
 
 	
@@ -265,4 +321,22 @@ function collisionResponseLine (circle, line, time) {
 	var closerPointResult = distanceFromPointToLine (circle.center(), line)
 	var closestPoint = closerPointResult.closestPoint;
 	collisionResponsePoint(circle, closestPoint, 0);
+}
+
+function collisionDetectionMovingLineSegment (circle, lineSegment, timeLeft) {
+	var relativeVelocity = sumOfVectors (circle.vel, multiplyVectorByScalar (lineSegment.vel, -1));
+	var relativeCircle = new Circle (circle.x, circle.y, circle.radius, relativeVelocity.x, relativeVelocity.y);
+	var relativeCollision = collisionDetectionLineSegment (relativeCircle, lineSegment, timeLeft);
+	if (relativeCollision.shape !== null) {
+		relativeCollision.circle = circle;
+		relativeCollision.collisionResponse = collisionResponseMovingLineSegment;
+	}
+	return relativeCollision;
+}
+
+function collisionResponseMovingLineSegment (circle, lineSegment, time) {
+	var closerPointResult = distanceFromPointToLine (circle.center(), lineSegment)
+	var closestPoint = closerPointResult.closestPoint;
+	var collisionCircle = new StableCircle (closestPoint.x, closestPoint.y, 0, lineSegment.vel.x, lineSegment.vel.y);
+	collisionResponseMovingCircle (circle, collisionCircle, time);
 }

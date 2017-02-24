@@ -151,6 +151,11 @@
 			ctx.beginPath();
 		});
 
+		movingLineSegments.forEach (function (line) {
+			ctx.moveTo (line.x1, line.y1);
+			ctx.lineTo (line.x2, line.y2);
+		});
+
 		//ctx.stroke();
 		//console.log ("lines");
 		lines.forEach(function (line) {
@@ -202,6 +207,12 @@
 			circle.x+= circle.vel.x*time;
 			circle.y+= circle.vel.y*time;
 		})
+		movingLineSegments.forEach (function (line) {
+			line.x1+= line.vel.x*time;
+			line.x2+= line.vel.x*time;
+			line.y1+= line.vel.y*time;
+			line.y2+= line.vel.y*time;
+		});
 	}
 
 	var timeSpeed = 50;
@@ -240,6 +251,12 @@
 					collision = collisionMin (collision, collisionDetectionLineBorder (circle, line, timeLeft));
 				})
 			});
+
+			movingLineSegments.forEach (function (lineSegment) {
+				borderLines.forEach (function (line) {
+					collision = collisionMin (collision, collisionDetectionMovingLineSegmentLineBorder (lineSegment, line, timeLeft));
+				})
+			});
 			
 			circles.forEach (function (circle){
 
@@ -276,6 +293,17 @@
 						collision = collisionMin (collision, point1Collision);
 						collision = collisionMin (collision, point2Collision);
 					//}	
+				})
+
+				movingLineSegments.forEach (function (line) {
+					var lineCollision = collisionDetectionMovingLineSegment (circle, line, timeLeft);
+					var point1Collision = collisionDetectionMovingCircle(circle, 
+						new StableCircle (line.x1, line.y1, 0, line.vel.x, line.vel.y), timeLeft);
+					var point2Collision = collisionDetectionMovingCircle(circle, 
+						new StableCircle (line.x2, line.y2, 0, line.vel.x, line.vel.y), timeLeft);
+					collision = collisionMin (collision, lineCollision);
+					collision = collisionMin (collision, point1Collision);
+					collision = collisionMin (collision, point2Collision);
 				})
 		
 				
@@ -325,20 +353,10 @@
 				moveCircles(collision.time);
 				collision.collisionResponse (collision.circle, collision.shape, collision.time);
 
-				//draw velocity
-				//ctx.strokeStyle="#FF0000";
-				//		ctx.moveTo (circle.x, circle.y);
-				//		ctx.lineTo (circle.x + circle.vel.x * 500, circle.y + circle.vel.y * 500);
-				//		ctx.stroke();
-
 				timeLeft-= collision.time;
 				collisionCounter++;
 			} else {
-				/*
-				circles.forEach (function (circle){
-					circle.x+= circle.vel.x*timeLeft;
-					circle.y+= circle.vel.y*timeLeft;
-				})*/
+
 				moveCircles(timeLeft);
 				
 				timeLeft = 0
@@ -346,10 +364,7 @@
 
 
 			if (collisionCounter > 1000) {
-				/*circles.forEach (function (circle){
-					circle.x+= circle.vel.x*timeLeft;
-					circle.y+= circle.vel.y*timeLeft;
-				})*/
+
 				console.log ("too many collisions");
 				moveCircles(timeLeft);
 				timeLeft = 0
@@ -360,18 +375,6 @@
 				clearInterval (animation);
 			}
 
-			
-			/*
-			lineSegments.forEach (function (line) {
-				
-				if (distanceFromPointToLine({x: circle.x, y: circle.y}, line).distance < 9.9){
-					console.log ("distance: " + distanceFromPointToLine({x: circle.x, y: circle.y}, line).distance)
-					console.log ("circle is WAY TOO CLOSE");
-					paused = true;
-					clearInterval (animation);
-				}
-			})
-*/		
 		}
 
 		if (!halting) {
@@ -400,6 +403,7 @@
 	var stillCircles = [];
 	var stableCircles = [];
 	var lineSegments = [];
+	var movingLineSegments = [];
 
 	//moves the first circle
 	function setCirclePos (event) {
@@ -437,10 +441,11 @@
 			new Circle (250,250, 40, 0, 0)
 		]
 		*/
-
+		/*
 		stableCircles = [
 			new StableCircle (250,250, 40, 0.1, 0)
 		]
+		*/
 
 		var gridSpace = 50;
 		for (var i = gridSpace; i <= width; i+= gridSpace) {
@@ -454,6 +459,10 @@
 			new BorderLine (5, Border.Types.horizontal),
 			new BorderLine (height - 5, Border.Types.horizontal)
 		];
+
+		movingLineSegments = [
+			new MovingLineSegment (200, 400, 300, 200, 0.1, 0)
+		]
 		
 		/*
 		lineSegments = [

@@ -36,6 +36,11 @@ function LineSegment (x1, y1, x2, y2) {
 	this.y2 = y2;
 }
 
+function MovingLineSegment (x1, y1, x2, y2, velX, velY) {
+	LineSegment.call (this, x1, y1, x2, y2);
+	this.vel = new Vector (velX, velY);
+}
+
 function Vector (x, y) {
 	this.x = x;
 	this.y = y;
