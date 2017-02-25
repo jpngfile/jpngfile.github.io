@@ -69,83 +69,7 @@
 			ctx.lineTo (line.x2, line.y2);
 			ctx.stroke();
 
-			if (debugMode){
-
-				circles.forEach (function (circle) {
-					ctx.beginPath();
-					ctx.strokeStyle='#00FFFF'; //cyan
-					var perpedicularLines = perpendicularVector (vectorOfLine(line), circle.radius);	
-					var collisionLine1 = translateLine (line, perpedicularLines[0])
-					var collisionLine2 = translateLine (line, perpedicularLines[1])
-					ctx.moveTo (collisionLine1.x1, collisionLine1.y1);
-					ctx.lineTo (collisionLine1.x2, collisionLine1.y2);
-					ctx.moveTo (collisionLine2.x1, collisionLine2.y1);
-					ctx.lineTo (collisionLine2.x2, collisionLine2.y2);
-					ctx.stroke();
-
-					//Draw the intersecting points
-					ctx.beginPath();
-					//ctx.strokeStyle='#FF0000'; // red
-					var circleEndPoint = {
-						x : circle.x + circle.vel.x,
-						y :	circle.y + circle.vel.y
-					}
-					var circleLine = {x1: circle.x, y1: circle.y, x2: circle.x + circle.vel.x, y2: circle.y + circle.vel.y};
-					//console.log ("get intersections");
-					var interPoint1 = intersectionOfLines(circleLine, collisionLine1);
-					var interPoint2 = intersectionOfLines(circleLine, collisionLine2);
-					//console.log ("get distances");
-
-					if (interPoint1 != null && interPoint2 != null) {
-						var collisionDistance1 = relativeDistanceBetweenPoints({x : circle.x, y : circle.y}, circleEndPoint, interPoint1);
-						var collisionDistance2 = relativeDistanceBetweenPoints({x : circle.x, y : circle.y}, circleEndPoint, interPoint2);
-
-						var closerCollisionPoint = null;
-						var fartherCollisionPoint = null;
-
-							//This is actually enough to check because if the distance would be negative, the collision won't happen anyways
-						if (Math.abs(collisionDistance1) < Math.abs(collisionDistance2)) {
-							closerCollisionPoint = interPoint1;
-							fartherCollisionPoint = interPoint2;
-						} else {
-							closerCollisionPoint = interPoint2;
-							fartherCollisionPoint = interPoint1;
-						}
-
-						//console.log ("drawing the intersections");
-						if (closerCollisionPoint != null){
-							ctx.strokeStyle = '#00FF00'; // green
-							ctx.moveTo(closerCollisionPoint.x - indentLength, closerCollisionPoint.y);
-							ctx.lineTo(closerCollisionPoint.x + indentLength, closerCollisionPoint.y);
-							ctx.stroke();
-							ctx.beginPath();
-						}
-						//console.log ("first intersection");
-
-						if (fartherCollisionPoint != null){
-							ctx.strokeStyle='#FF0000'; // red
-							ctx.moveTo(fartherCollisionPoint.x - indentLength, fartherCollisionPoint.y);
-							ctx.lineTo(fartherCollisionPoint.x + indentLength, fartherCollisionPoint.y);
-							ctx.stroke();
-							ctx.beginPath();
-						}
-						/*
-						if (interPoint1 != null){
-							ctx.moveTo(interPoint1.x - indentLength, interPoint1.y);
-							ctx.lineTo(interPoint1.x + indentLength, interPoint1.y);
-						}
-						if (interPoint2 != null){
-							ctx.moveTo(interPoint2.x - indentLength, interPoint2.y);
-							ctx.lineTo(interPoint2.x + indentLength, interPoint2.y);
-						}
-						*/
-					}
-				});
-				//Draw the bordering lines
-				
-			}
-			
-			ctx.stroke();
+			//ctx.stroke();
 
 			ctx.strokeStyle='#000000';
 			ctx.beginPath();
@@ -196,6 +120,8 @@
 			ctx.arc (circle.x,circle.y, circle.radius, 0, 2*Math.PI);
 			ctx.stroke();
 		})
+
+		ctx.fillText ("total Energy: " + getTotalEnergy(circles).toString(), 20, 20);
 	}
 
 	function moveCircles(time) {
@@ -213,6 +139,14 @@
 			line.y1+= line.vel.y*time;
 			line.y2+= line.vel.y*time;
 		});
+	}
+
+	function getTotalEnergy (circles) {
+		var energy = 0;
+		circles.forEach (function (circle) {
+			energy+= (0.5*circle.area()*Math.pow (getLengthOfVector(circle.vel), 2));
+		})
+		return energy;
 	}
 
 	var timeSpeed = 50;
@@ -269,26 +203,7 @@
 					var point1Collision = collisionDetectionPoint(circle, new Point (line.x1, line.y1), timeLeft);
 					var point2Collision = collisionDetectionPoint(circle, new Point (line.x2, line.y2), timeLeft);
 					
-					/*
-					if (lineCollision.shape != null){
-						console.log ("line segment collision");
-						console.log (lineCollision.shape);
-						console.log (lineCollision.time);
-					}
-					if (point1Collision.shape != null){
-						console.log ("point1 segment collision");
-						console.log (point1Collision.shape);
-						console.log (point1Collision.time);
-					}
-					if (point2Collision.shape != null){
-						console.log ("point2 segment collision");
-						console.log (point2Collision.shape);
-						console.log (point2Collision.time);
-					}
-					*/
-					
-					
-					//} else {
+
 						collision = collisionMin (collision, lineCollision);
 						collision = collisionMin (collision, point1Collision);
 						collision = collisionMin (collision, point2Collision);
@@ -340,8 +255,6 @@
 				})
 			})
 
-				
-			//Note: currently only the lasts collision takes place, rather than the earliest
 			if (collision.shape != null && Math.abs (collision.time) <= timeLeft) {
 
 				if (pausedMode) {
@@ -411,6 +324,11 @@
 		circles[0].y = event.clientY - 100;
 	}
 
+	//set paddle speed
+	function setPaddleVelX (velX) {
+		movingLineSegments[0].vel.x = velX;
+	}
+
 	//Note: remember to resize everything when the display size changes
 	function init(){
 		
@@ -428,11 +346,11 @@
 		var height = ctx.canvas.height;
 
 		circles = [
-		new Circle (200, 240, 30, 0, 0),
-		//new Circle (112, 200, 30, 0.2, 0.2),
-		//new Circle (100,100, 30, 0.2, 0.3),
-		//new Circle (300, 200, 30, 0.1, 0.04),
-		//new Circle (450, 350, 30, -0.2, 0.1),
+		new Circle (200, 240, 30, 0.1, 0.1),
+		new Circle (112, 200, 30, 0.2, 0.2),
+		new Circle (100,100, 30, 0.2, 0.3),
+		new Circle (300, 200, 30, 0.1, 0.04),
+		new Circle (450, 350, 30, -0.2, 0.1),
 		//new Circle (228, 450, 20, -0.005, 0.1)
 		];
 
@@ -461,7 +379,7 @@
 		];
 
 		movingLineSegments = [
-			new MovingLineSegment (200, 400, 300, 200, 0.1, 0)
+			new MovingLineSegment (200, 400, 300, 400, 0, 0)
 		]
 		
 		/*
@@ -524,7 +442,41 @@
 		}
 	}
 
-	document.onkeydown = pauseAnimation;
+	var leftDown = false;
+	var rightDown = false;
+	//document.onkeydown = pauseAnimation;
+	document.addEventListener ('keydown', function (event) {
+		if (event.keyCode == 37) {
+			console.log ("Left was down");
+			setPaddleVelX (-0.1);
+			leftDown = true;
+		} else if (event.keyCode == 39) {
+			console.log ("Right was down");
+			setPaddleVelX (0.1);
+			rightDown = true;
+		} else {
+			pauseAnimation();
+		}
+	});
+
+	document.addEventListener ('keyup', function (event) {
+		if (event.keyCode == 37) {
+			console.log ("Left was lifted");
+			setPaddleVelX (0);
+			leftDown = false;
+			if (rightDown) {
+				setPaddleVelX (0.1);
+			}
+		} else if (event.keyCode == 39) {
+			console.log ("Right was lifted");
+			setPaddleVelX (0);
+			rightDown = false;
+			if (leftDown) {
+				setPaddleVelX (-0.1);
+			}
+		} 
+	});
+
 })(window,document);
 
 function pauseAnimation (event) {

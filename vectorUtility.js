@@ -168,3 +168,7 @@ function unitVector (vector) {
 	}
 	return vectorUnitVector;
 }
+
+function getLengthOfVector (vector){
+	return Math.sqrt (vector.x * vector.x + vector.y * vector.y);
+}
