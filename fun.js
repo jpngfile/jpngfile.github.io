@@ -1,6 +1,5 @@
 //TODO:
-//add moving point
-//add moving line segment
+//add rectangle shapes
 
 (function (window,document){
 	'use strict';
@@ -57,32 +56,18 @@
 		}
 
 		ctx.strokeStyle = '#000000'; // black
-		circles.forEach (function (circle) {
+
+		var allCircles = circles.concat (stillCircles).concat(stableCircles);
+		allCircles.forEach (function (circle) {
 			ctx.beginPath();
 			ctx.arc (circle.x,circle.y, circle.radius, 0, 2*Math.PI);
 			ctx.stroke();
-		});
+		})
 
 		ctx.beginPath();
-		lineSegments.forEach(function (line) {
-			ctx.moveTo (line.x1, line.y1);
-			ctx.lineTo (line.x2, line.y2);
-			ctx.stroke();
 
-			//ctx.stroke();
-
-			ctx.strokeStyle='#000000';
-			ctx.beginPath();
-		});
-
-		movingLineSegments.forEach (function (line) {
-			ctx.moveTo (line.x1, line.y1);
-			ctx.lineTo (line.x2, line.y2);
-		});
-
-		//ctx.stroke();
-		//console.log ("lines");
-		lines.forEach(function (line) {
+		var allLines = lines.concat (lineSegments).concat (movingLineSegments);
+		allLines.forEach(function (line) {
 			ctx.moveTo (line.x1, line.y1);
 			ctx.lineTo (line.x2, line.y2);
 		});
@@ -108,19 +93,6 @@
 		
 		ctx.stroke();
 		//console.log ("end drawing");
-
-		stillCircles.forEach (function (circle) {
-			ctx.beginPath();
-			ctx.arc (circle.x,circle.y, circle.radius, 0, 2*Math.PI);
-			ctx.stroke();
-		})
-
-		stableCircles.forEach (function (circle) {
-			ctx.beginPath();
-			ctx.arc (circle.x,circle.y, circle.radius, 0, 2*Math.PI);
-			ctx.stroke();
-		})
-
 		ctx.fillText ("total Energy: " + getTotalEnergy(circles).toString(), 20, 20);
 	}
 
@@ -354,16 +326,16 @@
 		//new Circle (228, 450, 20, -0.005, 0.1)
 		];
 
-		/*
+		
 		stillCircles = [
 			new Circle (250,250, 40, 0, 0)
 		]
-		*/
-		/*
+		
+		
 		stableCircles = [
-			new StableCircle (250,250, 40, 0.1, 0)
+			new StableCircle (250,300, 40, 0.1, 0)
 		]
-		*/
+		
 
 		var gridSpace = 50;
 		for (var i = gridSpace; i <= width; i+= gridSpace) {
@@ -378,18 +350,20 @@
 			new BorderLine (height - 5, Border.Types.horizontal)
 		];
 
+		
 		movingLineSegments = [
 			new MovingLineSegment (200, 400, 300, 400, 0, 0)
 		]
 		
-		/*
+		
+		
 		lineSegments = [
 			new LineSegment (130, height/2 - 130, 210, height/2 - 210),
 			new LineSegment (340, 60, 440, 160),
 			new LineSegment (200, 400, 300, 400),
 			new LineSegment (100, 250, 140, 400)
 		];
-		*/
+		
 
 		/*
 		lineSegments = [
