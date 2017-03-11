@@ -66,7 +66,7 @@
 
 		ctx.beginPath();
 
-		var allLines = lines.concat (lineSegments).concat (movingLineSegments);
+		var allLines = lines.concat (lineSegments).concat (movingLineSegments).concat (paddle.sides);
 		allLines.forEach(function (line) {
 			ctx.moveTo (line.x1, line.y1);
 			ctx.lineTo (line.x2, line.y2);
@@ -105,7 +105,7 @@
 			circle.x+= circle.vel.x*time;
 			circle.y+= circle.vel.y*time;
 		})
-		movingLineSegments.forEach (function (line) {
+		movingLineSegments.concat(paddle.sides).forEach (function (line) {
 			line.x1+= line.vel.x*time;
 			line.x2+= line.vel.x*time;
 			line.y1+= line.vel.y*time;
@@ -182,7 +182,7 @@
 					//}	
 				})
 
-				movingLineSegments.forEach (function (line) {
+				movingLineSegments.concat (paddle.sides).forEach (function (line) {
 					var lineCollision = collisionDetectionMovingLineSegment (circle, line, timeLeft);
 					var point1Collision = collisionDetectionMovingCircle(circle, 
 						new StableCircle (line.x1, line.y1, 0, line.vel.x, line.vel.y), timeLeft);
@@ -289,6 +289,7 @@
 	var stableCircles = [];
 	var lineSegments = [];
 	var movingLineSegments = [];
+	var paddle = new Rectangle (200, 400, 300, 415, 0, 0);
 
 	//moves the first circle
 	function setCirclePos (event) {
@@ -298,7 +299,7 @@
 
 	//set paddle speed
 	function setPaddleVelX (velX) {
-		movingLineSegments[0].vel.x = velX;
+		paddle.setVel (new Vector (velX, paddle.vel.y));
 	}
 
 	//Note: remember to resize everything when the display size changes
@@ -333,7 +334,7 @@
 		
 		
 		stableCircles = [
-			new StableCircle (250,300, 40, 0.1, 0)
+			//new StableCircle (250,300, 40, 0.1, 0)
 		]
 		
 
@@ -352,7 +353,7 @@
 
 		
 		movingLineSegments = [
-			new MovingLineSegment (200, 400, 300, 400, 0, 0)
+			//new MovingLineSegment (200, 400, 300, 400, 0, 0)
 		]
 		
 		
@@ -360,7 +361,7 @@
 		lineSegments = [
 			new LineSegment (130, height/2 - 130, 210, height/2 - 210),
 			new LineSegment (340, 60, 440, 160),
-			new LineSegment (200, 400, 300, 400),
+			//new LineSegment (200, 400, 300, 400),
 			new LineSegment (100, 250, 140, 400)
 		];
 		

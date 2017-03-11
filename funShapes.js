@@ -41,6 +41,25 @@ function MovingLineSegment (x1, y1, x2, y2, velX, velY) {
 	this.vel = new Vector (velX, velY);
 }
 
+//coord 1 is top-left, and coord 2 is bottom-right
+function Rectangle (x1, y1, x2, y2, velX, velY) {
+	this.width = x2 - x1;
+	this.height = y2 - y1;
+	this.top = new MovingLineSegment (x1, y1, x2, y1, velX, velY);
+	this.bottom = new MovingLineSegment (x1, y2, x2, y2, velX, velY);
+	this.left = new MovingLineSegment (x1, y1, x1, y2, velX, velY);
+	this.right = new MovingLineSegment (x2, y1, x2, y2, velX, velY);
+	this.sides = [this.top, this.bottom, this.left, this.right];
+	this.vel = new Vector (velX, velY);
+
+	this.setVel = function (newVel) {
+		this.vel = newVel;
+		(this.sides).forEach (function (lineSegment, index, arr) {
+			arr[index].vel = newVel;
+		});
+	};
+}
+
 function Vector (x, y) {
 	this.x = x;
 	this.y = y;
