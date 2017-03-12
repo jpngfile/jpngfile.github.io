@@ -6,6 +6,7 @@ var circles = [];
 var stillCircles = [];
 var stableCircles = [];
 var lineSegments = [];
+var rectangles = [];
 var movingLineSegments = [];
 var paddle = new Rectangle (200, 400, 300, 415, 0, 0);
 
@@ -13,7 +14,7 @@ function boardInit (width, height) {
 
 
 	circles = [
-		new Circle (200, 240, 30, 0.1, 0.1)
+		new Circle (150, 240, 10, 0.2, -0.2)
 		//new Circle (112, 200, 30, 0.2, 0.2),
 		//new Circle (100,100, 30, 0.2, 0.3),
 		//new Circle (300, 200, 30, 0.1, 0.04),
@@ -38,11 +39,13 @@ function boardInit (width, height) {
 		gridLines.push (new BorderLine (i, Border.Types.horizontal));
 	}
 
+	var vertBorderMargin = 5;
+	var horizBorderMargin = 5;
 	borderLines = [
-		new BorderLine (5, Border.Types.vertical),
-		new BorderLine (width - 5, Border.Types.vertical),
-		new BorderLine (5, Border.Types.horizontal),
-		new BorderLine (height - 5, Border.Types.horizontal)
+		new BorderLine (horizBorderMargin, Border.Types.vertical),
+		new BorderLine (width - horizBorderMargin, Border.Types.vertical),
+		new BorderLine (vertBorderMargin, Border.Types.horizontal),
+		new BorderLine (height - vertBorderMargin, Border.Types.horizontal)
 	];
 
 	
@@ -53,11 +56,31 @@ function boardInit (width, height) {
 	
 	
 	lineSegments = [
-		new LineSegment (130, height/2 - 130, 210, height/2 - 210),
-		new LineSegment (340, 60, 440, 160),
+		//new LineSegment (130, height/2 - 130, 210, height/2 - 210),
+		//new LineSegment (340, 60, 440, 160),
 		//new LineSegment (200, 400, 300, 400),
-		new LineSegment (100, 250, 140, 400)
+		//new LineSegment (100, 250, 140, 400)
 	];
+
+	
+	var horrizMargin = 25;
+	var vertMargin = 25;
+	var blockGridWidth = width - 2*(horrizMargin + horizBorderMargin);
+	var numBlockRows = 6;
+	var numBlockCols = 10;
+	let blockHeight = 20;
+	let blockWidth = blockGridWidth / numBlockCols
+
+	let horizTotalMargin = horizBorderMargin + horrizMargin;
+	let vertTotalMargin = vertBorderMargin + vertMargin;
+
+	for (var i = 0; i < blockGridWidth; i+= blockWidth) {
+		for (var j = 0; j < numBlockRows; j++) {
+			let blockHorizStart = horizTotalMargin + i;
+			let blockVertStart = vertTotalMargin + (j*blockHeight);
+			rectangles.push (new Rectangle (blockHorizStart, blockVertStart, blockHorizStart + blockWidth, blockVertStart + blockHeight, 0, 0))
+		}
+	} 
 	
 
 	/*
@@ -181,7 +204,11 @@ function drawShapes(ctx, c, debugMode=false, gridMode=false){
 
 	ctx.beginPath();
 
-	var allLines = lines.concat (lineSegments).concat (movingLineSegments).concat (paddle.sides);
+	var rectangleLines = rectangles.reduce (function (arr, rect) {
+		return arr.concat (rect.sides)
+	}, []);
+
+	var allLines = lines.concat (lineSegments).concat (movingLineSegments).concat (paddle.sides).concat (rectangleLines);
 	allLines.forEach(function (line) {
 		ctx.moveTo (line.x1, line.y1);
 		ctx.lineTo (line.x2, line.y2);
@@ -268,6 +295,24 @@ function getClosestCollision (timeLeft) {
 			collision = collisionMin (collision, point2Collision);
 		})
 
+		rectangles.forEach (function (rect, index) {
+			rect.sides.forEach (function (line) {
+				let point1 = new StableCircle (line.x1, line.y1, 0, line.vel.x, line.vel.y)
+				let point2 = new StableCircle (line.x2, line.y2, 0, line.vel.x, line.vel.y)
+				var lineCollision = collisionDetectionMovingLineSegment (circle, line, timeLeft);
+				var point1Collision = collisionDetectionMovingCircle(circle, point1, timeLeft);
+				var point2Collision = collisionDetectionMovingCircle(circle, point2, timeLeft);
+				collision = collisionMin (collision, lineCollision);
+				collision = collisionMin (collision, point1Collision);
+				collision = collisionMin (collision, point2Collision);
+
+				if (collision.shape === line || collision.shape === point1 || collision.shape === point2) {
+					console.log ("collided with rectangle")
+					collision.arr = rectangles;
+					collision.index = index;
+				}
+			})
+		})
 		
 		points.forEach (function (point) {
 			collision = collisionMin (collision, collisionDetectionPoint (circle, point, timeLeft));

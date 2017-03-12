@@ -138,15 +138,16 @@
 
 	var leftDown = false;
 	var rightDown = false;
+	let paddleVel = 0.2
 	//document.onkeydown = pauseAnimation;
 	document.addEventListener ('keydown', function (event) {
 		if (event.keyCode == 37) {
 			console.log ("Left was down");
-			setPaddleVelX (-0.1);
+			setPaddleVelX (-paddleVel);
 			leftDown = true;
 		} else if (event.keyCode == 39) {
 			console.log ("Right was down");
-			setPaddleVelX (0.1);
+			setPaddleVelX (paddleVel);
 			rightDown = true;
 		} else {
 			pauseAnimation();
@@ -159,14 +160,14 @@
 			setPaddleVelX (0);
 			leftDown = false;
 			if (rightDown) {
-				setPaddleVelX (0.1);
+				setPaddleVelX (paddleVel);
 			}
 		} else if (event.keyCode == 39) {
 			console.log ("Right was lifted");
 			setPaddleVelX (0);
 			rightDown = false;
 			if (leftDown) {
-				setPaddleVelX (-0.1);
+				setPaddleVelX (-paddleVel);
 			}
 		} 
 	});
