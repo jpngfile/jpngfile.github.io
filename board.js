@@ -14,7 +14,7 @@ function boardInit (width, height) {
 
 
 	circles = [
-		new Circle (150, 240, 10, 0.2, -0.2)
+		new Circle (250, 390, 10, 0, 0)
 		//new Circle (112, 200, 30, 0.2, 0.2),
 		//new Circle (100,100, 30, 0.2, 0.3),
 		//new Circle (300, 200, 30, 0.1, 0.04),
@@ -117,21 +117,25 @@ function boardInit (width, height) {
 		*/
 }
 
-	function moveCircles(time) {
+	function moveCircles(time, loadMode=false) {
 		circles.forEach (function (circle){
 			circle.x+= circle.vel.x*time;
 			circle.y+= circle.vel.y*time;
-		})
+		});
 		stableCircles.forEach (function (circle){
 			circle.x+= circle.vel.x*time;
 			circle.y+= circle.vel.y*time;
-		})
+		});
 		movingLineSegments.concat(paddle.sides).forEach (function (line) {
 			line.x1+= line.vel.x*time;
 			line.x2+= line.vel.x*time;
 			line.y1+= line.vel.y*time;
 			line.y2+= line.vel.y*time;
 		});
+		if (loadMode && circles.length > 0) {
+			circles[0].x+= paddle.vel.x*time;
+			circles[0].y+= paddle.vel.y*time;
+		}
 	}
 
 	function getTotalEnergy (circles) {

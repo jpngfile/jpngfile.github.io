@@ -1,14 +1,15 @@
 //TODO:
-//add rectangle shapes
+//add friction to paddle for weird bounce pattern
+//add github board
 
 (function (window,document){
 	'use strict';
 
-
-	var timeSpeed = 50;
-	var prevTime = 0
-	var epsilon = 0.00001
-	var paused = false
+	let timeSpeed = 50;
+	let epsilon = 0.00001;
+	var prevTime = 0;
+	var paused = false;
+	var loadMode = true;
 
 	var frameByFrameMode = false;
 	var pausedMode = false;
@@ -19,19 +20,15 @@
 	var lineSegmentCollisionCounter = 0;
 
 	function moveShapes(){
-		//console.log ("moveCounter: " + moveCounter);
-		//moveCounter++;
+
 		var currentTime = Date.now();
 		var timeLeft = currentTime - prevTime;
-
-		//console.log (timeLeft);
 		var halting = false;
-
 		var collisionCounter = 0
+
 		while (timeLeft > epsilon) {
 			
 			var collision = getClosestCollision (timeLeft);
-
 			if (collision.shape != null && Math.abs (collision.time) <= timeLeft) {
 
 				if (pausedMode) {
@@ -39,22 +36,21 @@
 					timeLeft = 0;
 					clearInterval (animation);
 				}
-				//console.log (collision.time);
-				moveCircles(collision.time);
+
+				moveCircles(collision.time,loadMode);
 				collision.collisionResponse (collision.circle, collision.shape, collision.time);
 
+				//remove shape on collision
 				if (collision.hasOwnProperty("arr") && collision.hasOwnProperty("index")) {
 					collision.arr.splice (collision.index, 1)
-					//console.log ("spliced: " + collision.index);
 				} 
 
 				timeLeft-=collision.time;
 				collisionCounter++;
 			} else {
-				moveCircles(timeLeft);
+				moveCircles(timeLeft,loadMode);
 				timeLeft = 0
 			}
-
 
 			//debugging conditions
 			if (collisionCounter > 1000) {
@@ -149,6 +145,10 @@
 			console.log ("Right was down");
 			setPaddleVelX (paddleVel);
 			rightDown = true;
+		} else if (event.keyCode == 38 && loadMode) {
+			console.log ("Game start");
+			if (circles.length > 0) {circles[0].vel = new Vector (0.2, -0.2);}
+			loadMode = false;
 		} else {
 			pauseAnimation();
 		}
