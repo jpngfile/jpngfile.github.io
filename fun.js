@@ -44,7 +44,13 @@
 				if (collision.hasOwnProperty("arr") && collision.hasOwnProperty("index")) {
 					collision.arr.splice (collision.index, 1)
 					incrementScore();
-				} 
+					if (circles.length <= 0) {
+						console.log ("Game over")
+						resetBoard();
+						timeLeft = 0;
+						loadMode = true;
+					}
+				}
 
 				timeLeft-=collision.time;
 				collisionCounter++;

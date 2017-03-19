@@ -199,7 +199,7 @@ function collisionResponseMovingCircle (circle1, circle2, timeLeft) {
 	var newCircleVel1 = rotateVector(circle1.vel, angle);
 	var newCircleVel2 = rotateVector(circle2.vel, angle);
 
-	if (circle2.isStable) {
+	if (circle2.hasOwnProperty("isStable")) {
 		newCircleVel1.x *= -1;
 		//if they're moving in opposite directions
 		if (newCircleVel1.x * newCircleVel2.x >= 0) {

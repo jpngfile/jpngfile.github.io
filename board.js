@@ -42,11 +42,13 @@ function boardInit (width, height) {
 
 	var vertBorderMargin = 5;
 	var horizBorderMargin = 5;
+	var bottomLine = new BorderLine (height - vertBorderMargin, Border.Types.horizontal)
+	bottomLine.isBottom = true;
 	borderLines = [
 		new BorderLine (horizBorderMargin, Border.Types.vertical),
 		new BorderLine (width - horizBorderMargin, Border.Types.vertical),
 		new BorderLine (vertBorderMargin, Border.Types.horizontal),
-		new BorderLine (height - vertBorderMargin, Border.Types.horizontal)
+		bottomLine
 	];
 
 	
@@ -151,6 +153,12 @@ function getTotalEnergy (circles) {
 
 function incrementScore () {
 	score += 10;
+}
+
+
+function resetBoard () {
+	circles.push(new Circle (250, 390, 10, 0, 0));
+	paddle = new Rectangle (200, 400, 300, 415, 0, 0);
 }
 
 function drawShapes(ctx, c, debugMode=false, gridMode=false){
@@ -270,10 +278,14 @@ function getClosestCollision (timeLeft) {
 		})
 	});
 	
-	circles.forEach (function (circle){
+	circles.forEach (function (circle, circIndex){
 
 		borderLines.forEach (function (line) {
 			collision = collisionMin (collision, collisionDetectionLineBorder (circle, line, timeLeft));
+			if (collision.shape === line && line.hasOwnProperty ("isBottom")) {
+				collision.arr = circles;
+				collision.index = circIndex;
+			}
 		})
 
 		lineSegments.forEach (function (line, index) {
