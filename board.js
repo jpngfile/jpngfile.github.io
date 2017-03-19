@@ -8,6 +8,7 @@ var stableCircles = [];
 var lineSegments = [];
 var rectangles = [];
 var movingLineSegments = [];
+var score = 0;
 var paddle = new Rectangle (200, 400, 300, 415, 0, 0);
 
 function boardInit (width, height) {
@@ -115,36 +116,42 @@ function boardInit (width, height) {
 		{x : 400, y : 400}
 		];
 		*/
+
+		score = 0;
 }
 
-	function moveCircles(time, loadMode=false) {
-		circles.forEach (function (circle){
-			circle.x+= circle.vel.x*time;
-			circle.y+= circle.vel.y*time;
-		});
-		stableCircles.forEach (function (circle){
-			circle.x+= circle.vel.x*time;
-			circle.y+= circle.vel.y*time;
-		});
-		movingLineSegments.concat(paddle.sides).forEach (function (line) {
-			line.x1+= line.vel.x*time;
-			line.x2+= line.vel.x*time;
-			line.y1+= line.vel.y*time;
-			line.y2+= line.vel.y*time;
-		});
-		if (loadMode && circles.length > 0) {
-			circles[0].x+= paddle.vel.x*time;
-			circles[0].y+= paddle.vel.y*time;
-		}
+function moveCircles(time, loadMode=false) {
+	circles.forEach (function (circle){
+		circle.x+= circle.vel.x*time;
+		circle.y+= circle.vel.y*time;
+	});
+	stableCircles.forEach (function (circle){
+		circle.x+= circle.vel.x*time;
+		circle.y+= circle.vel.y*time;
+	});
+	movingLineSegments.concat(paddle.sides).forEach (function (line) {
+		line.x1+= line.vel.x*time;
+		line.x2+= line.vel.x*time;
+		line.y1+= line.vel.y*time;
+		line.y2+= line.vel.y*time;
+	});
+	if (loadMode && circles.length > 0) {
+		circles[0].x+= paddle.vel.x*time;
+		circles[0].y+= paddle.vel.y*time;
 	}
+}
 
-	function getTotalEnergy (circles) {
-		var energy = 0;
-		circles.forEach (function (circle) {
-			energy+= (0.5*circle.area()*Math.pow (getLengthOfVector(circle.vel), 2));
-		})
-		return energy;
-	}
+function getTotalEnergy (circles) {
+	var energy = 0;
+	circles.forEach (function (circle) {
+		energy+= (0.5*circle.area()*Math.pow (getLengthOfVector(circle.vel), 2));
+	})
+	return energy;
+}
+
+function incrementScore () {
+	score += 10;
+}
 
 function drawShapes(ctx, c, debugMode=false, gridMode=false){
 
@@ -239,7 +246,8 @@ function drawShapes(ctx, c, debugMode=false, gridMode=false){
 
 	ctx.stroke();
 	//console.log ("end drawing");
-	ctx.fillText ("total Energy: " + getTotalEnergy(circles).toString(), 20, 20);
+	//ctx.fillText ("total Energy: " + getTotalEnergy(circles).toString(), 20, 20);
+	ctx.fillText ("Score: " + score.toString(), 20, 20);
 }
 
 function getClosestCollision (timeLeft) {

@@ -43,6 +43,7 @@
 				//remove shape on collision
 				if (collision.hasOwnProperty("arr") && collision.hasOwnProperty("index")) {
 					collision.arr.splice (collision.index, 1)
+					incrementScore();
 				} 
 
 				timeLeft-=collision.time;
