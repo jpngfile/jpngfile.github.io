@@ -67,8 +67,8 @@ function Board(width, height) {
 	];
 
 	this.rectangles = [];
-	var horrizMargin = 25;
-	var vertMargin = 25;
+	var horrizMargin = 30;
+	var vertMargin = 30;
 	var blockGridWidth = width - 2 * (horrizMargin + horizBorderMargin);
 	var numBlockRows = 6;
 	var numBlockCols = 10;
@@ -90,6 +90,7 @@ function Board(width, height) {
 	this.lines = [];
 
 	this.score = 0;
+	this.lives = 3;
 	this.paddle = new Rectangle(200, 400, 300, 415, 0, 0);
 
 	this.moveCircles = function (time, loadMode = false) {
@@ -231,6 +232,7 @@ function Board(width, height) {
 		//console.log ("end drawing");
 		//ctx.fillText ("total Energy: " + getTotalEnergy(circles).toString(), 20, 20);
 		ctx.fillText("Score: " + this.score.toString(), 20, 20);
+		ctx.fillText("Lives: " + this.lives.toString(), 20, 30);
 	}
 
 	this.drawGameOver = function (ctx, c) {

@@ -1,4 +1,6 @@
 //TODO:
+//add lives display
+//don't add score when dying
 //add friction to paddle for weird bounce pattern
 //add github board
 
@@ -18,7 +20,6 @@
 
 	var moveCounter = 0;
 	var lineSegmentCollisionCounter = 0;
-	var lives = 3;
 
 	function moveShapes(){
 
@@ -47,11 +48,11 @@
 					board.incrementScore();
 					if (board.circles.length <= 0) {
 						
-						if (lives > 0) {
+						if (board.lives > 0) {
 							board.resetBoard();
 							timeLeft = 0;
 							loadMode = true;
-							lives--;
+							board.lives--;
 						} else {
 							clearInterval (animation);
 							halting = true;
