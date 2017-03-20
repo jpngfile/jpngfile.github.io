@@ -233,6 +233,18 @@ function Board(width, height) {
 		ctx.fillText("Score: " + this.score.toString(), 20, 20);
 	}
 
+	this.drawGameOver = function (ctx, c) {
+		console.log ("Game over")
+		
+		ctx.beginPath();
+		ctx.clearRect(0, 0, c.width, c.height);
+		ctx.font = "40px Verdana";
+		ctx.textAlign="center";
+		ctx.fillText("Game Over", c.width / 2, c.height / 2);
+		ctx.stroke();
+		ctx.closePath();
+	}
+
 	this.getClosestCollision = function(timeLeft) {
 
 		var collision = {

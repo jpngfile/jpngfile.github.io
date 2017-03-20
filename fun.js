@@ -18,6 +18,7 @@
 
 	var moveCounter = 0;
 	var lineSegmentCollisionCounter = 0;
+	var lives = 3;
 
 	function moveShapes(){
 
@@ -45,10 +46,17 @@
 					collision.arr.splice (collision.index, 1)
 					board.incrementScore();
 					if (board.circles.length <= 0) {
-						console.log ("Game over")
-						board.resetBoard();
-						timeLeft = 0;
-						loadMode = true;
+						
+						if (lives > 0) {
+							board.resetBoard();
+							timeLeft = 0;
+							loadMode = true;
+							lives--;
+						} else {
+							clearInterval (animation);
+							halting = true;
+							board.drawGameOver(ctx, c);
+						}
 					}
 				}
 
@@ -146,15 +154,15 @@
 	//document.onkeydown = pauseAnimation;
 	document.addEventListener ('keydown', function (event) {
 		if (event.keyCode == 37) {
-			console.log ("Left was down");
+			//console.log ("Left was down");
 			setPaddleVelX (-paddleVel);
 			leftDown = true;
 		} else if (event.keyCode == 39) {
-			console.log ("Right was down");
+			//console.log ("Right was down");
 			setPaddleVelX (paddleVel);
 			rightDown = true;
 		} else if (event.keyCode == 38 && loadMode) {
-			console.log ("Game start");
+			//console.log ("Game start");
 			if (board.circles.length > 0) {board.circles[0].vel = new Vector (0.2, -0.2);}
 			loadMode = false;
 		} else {
@@ -164,14 +172,14 @@
 
 	document.addEventListener ('keyup', function (event) {
 		if (event.keyCode == 37) {
-			console.log ("Left was lifted");
+			//console.log ("Left was lifted");
 			setPaddleVelX (0);
 			leftDown = false;
 			if (rightDown) {
 				setPaddleVelX (paddleVel);
 			}
 		} else if (event.keyCode == 39) {
-			console.log ("Right was lifted");
+			//console.log ("Right was lifted");
 			setPaddleVelX (0);
 			rightDown = false;
 			if (leftDown) {
