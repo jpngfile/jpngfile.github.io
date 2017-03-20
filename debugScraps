@@ -96,3 +96,36 @@ if (debugMode){
 					
 					
 					//} else {
+
+						/*
+	lineSegments = [
+		{x1 : 0, y1 : height/2, x2 : width/2, y2 : 0},
+		{x1 : width/2, y1 : 0, x2 : width, y2 : height/2},
+		{x1 : width, y1 : height/2, x2 : width/2, y2 : height},
+		{x1 : width/2, y1 : height, x2 : 0, y2 : height/2}
+	];
+	*/
+
+	/*
+		points = [
+		{x : 100, y : 100},
+		{x : 200, y : 100},
+		{x : 300, y : 100},
+		{x : 400, y : 100},
+
+		{x : 100, y : 200},
+		{x : 200, y : 200},
+		{x : 300, y : 200},
+		{x : 400, y : 200},
+
+		{x : 100, y : 300},
+		{x : 200, y : 300},
+		{x : 300, y : 300},
+		{x : 400, y : 300},
+
+		{x : 100, y : 400},
+		{x : 200, y : 400},
+		{x : 300, y : 400},
+		{x : 400, y : 400}
+		];
+		*/

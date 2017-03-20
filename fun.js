@@ -28,7 +28,7 @@
 
 		while (timeLeft > epsilon) {
 			
-			var collision = getClosestCollision (timeLeft);
+			var collision = board.getClosestCollision (timeLeft);
 			if (collision.shape != null && Math.abs (collision.time) <= timeLeft) {
 
 				if (pausedMode) {
@@ -37,16 +37,16 @@
 					clearInterval (animation);
 				}
 
-				moveCircles(collision.time,loadMode);
+				board.moveCircles(collision.time,loadMode);
 				collision.collisionResponse (collision.circle, collision.shape, collision.time);
 
 				//remove shape on collision
 				if (collision.hasOwnProperty("arr") && collision.hasOwnProperty("index")) {
 					collision.arr.splice (collision.index, 1)
-					incrementScore();
-					if (circles.length <= 0) {
+					board.incrementScore();
+					if (board.circles.length <= 0) {
 						console.log ("Game over")
-						resetBoard();
+						board.resetBoard();
 						timeLeft = 0;
 						loadMode = true;
 					}
@@ -55,7 +55,7 @@
 				timeLeft-=collision.time;
 				collisionCounter++;
 			} else {
-				moveCircles(timeLeft,loadMode);
+				board.moveCircles(timeLeft,loadMode);
 				timeLeft = 0
 			}
 
@@ -63,7 +63,7 @@
 			if (collisionCounter > 1000) {
 
 				console.log ("too many collisions");
-				moveCircles(timeLeft);
+				board.moveCircles(timeLeft);
 				timeLeft = 0
 				clearInterval (animation);
 			}
@@ -75,7 +75,7 @@
 		}
 
 		if (!halting) {
-			drawShapes(ctx, c);
+			board.drawShapes(ctx, c);
 		}
 
 		prevTime = Date.now();
@@ -84,6 +84,7 @@
 	var animation;
 	var c;
 	var ctx;
+	var board;
 	function startAnimation (){
 		c = document.getElementById("myCanvas");
 		ctx = c.getContext("2d");
@@ -94,13 +95,13 @@
 
 	//moves the first circle
 	function setCirclePos (event) {
-		circles[0].x = event.clientX;
-		circles[0].y = event.clientY - 100;
+		board.circles[0].x = event.clientX;
+		board.circles[0].y = event.clientY - 100;
 	}
 
 	//set paddle speed
 	function setPaddleVelX (velX) {
-		paddle.setVel (new Vector (velX, paddle.vel.y));
+		board.paddle.setVel (new Vector (velX, board.paddle.vel.y));
 	}
 
 	//Note: remember to resize everything when the display size changes
@@ -119,7 +120,7 @@
 		var width = ctx.canvas.width
 		var height = ctx.canvas.height;
 
-		boardInit (width, height);
+		board = new Board (width, height);
 		console.log ("init header")
 	}
 
@@ -154,7 +155,7 @@
 			rightDown = true;
 		} else if (event.keyCode == 38 && loadMode) {
 			console.log ("Game start");
-			if (circles.length > 0) {circles[0].vel = new Vector (0.2, -0.2);}
+			if (board.circles.length > 0) {board.circles[0].vel = new Vector (0.2, -0.2);}
 			loadMode = false;
 		} else {
 			pauseAnimation();
