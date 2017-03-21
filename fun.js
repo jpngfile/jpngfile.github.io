@@ -1,6 +1,4 @@
 //TODO:
-//add lives display
-//don't add score when dying
 //add friction to paddle for weird bounce pattern
 //add github board
 
@@ -44,8 +42,11 @@
 
 				//remove shape on collision
 				if (collision.hasOwnProperty("arr") && collision.hasOwnProperty("index")) {
+					if (collision.arr[collision.index] instanceof Rectangle) {
+						board.incrementScore(10 + collision.circle.bounceCounter);
+						collision.circle.bounceCounter+=1;
+					}
 					collision.arr.splice (collision.index, 1)
-					board.incrementScore();
 					if (board.circles.length <= 0) {
 						
 						if (board.lives > 0) {
@@ -59,6 +60,9 @@
 							board.drawGameOver(ctx, c);
 						}
 					}
+				}
+				if (collision.hasOwnProperty("paddleCollided")) {
+					collision.circle.bounceCounter = 0;
 				}
 
 				timeLeft-=collision.time;

@@ -7,6 +7,7 @@ function Circle (x, y, radius, velX, velY) {
 		x : velX,
 		y: velY
 	};
+	this.bounceCounter = 0;
 	this.area = function () {return Math.PI * Math.pow (this.radius, 2);}
 	//this.area = function () {return this.radius;}
 	this.center = function() {return new Point (this.x, this.y);}
@@ -57,6 +58,14 @@ function Rectangle (x1, y1, x2, y2, velX, velY) {
 			arr[index].vel = newVel;
 		});
 	};
+	this.init = function () {
+		(this.sides).forEach (function (lineSegment, index, arr) {
+			arr[index].isPaddle = true;
+		});
+		this.setVel (this.vel);
+	};
+
+	this.init();
 }
 
 function Vector (x, y) {

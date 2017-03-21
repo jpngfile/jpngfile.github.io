@@ -122,8 +122,8 @@ function Board(width, height) {
 		return energy;
 	}
 
-	this.incrementScore = function () {
-		this.score += 10;
+	this.incrementScore = function (points = 10) {
+		this.score += points;
 	}
 
 
@@ -300,14 +300,20 @@ function Board(width, height) {
 			}, this)
 
 			this.movingLineSegments.concat(this.paddle.sides).forEach(function(line) {
+				let point1 = new StableCircle(line.x1, line.y1, 0, line.vel.x, line.vel.y)
+				let point2 = new StableCircle(line.x2, line.y2, 0, line.vel.x, line.vel.y)
 				var lineCollision = collisionDetectionMovingLineSegment(circle, line, timeLeft);
 				var point1Collision = collisionDetectionMovingCircle(circle,
-					new StableCircle(line.x1, line.y1, 0, line.vel.x, line.vel.y), timeLeft);
+					point1, timeLeft);
 				var point2Collision = collisionDetectionMovingCircle(circle,
-					new StableCircle(line.x2, line.y2, 0, line.vel.x, line.vel.y), timeLeft);
+					point2, timeLeft);
 				collision = collisionMin(collision, lineCollision);
 				collision = collisionMin(collision, point1Collision);
 				collision = collisionMin(collision, point2Collision);
+				if ((collision.shape === line || collision.shape === point1 || collision.shape === point2) && line.hasOwnProperty("isPaddle")) {
+					//console.log("collided with paddle")
+					collision.paddleCollided = true;
+				}
 			}, this)
 
 			this.rectangles.forEach(function(rect, index) {
@@ -322,7 +328,7 @@ function Board(width, height) {
 					collision = collisionMin(collision, point2Collision);
 
 					if (collision.shape === line || collision.shape === point1 || collision.shape === point2) {
-						console.log("collided with rectangle")
+						//console.log("collided with rectangle")
 						collision.arr = this.rectangles;
 						collision.index = index;
 					}
