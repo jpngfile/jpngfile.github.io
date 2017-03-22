@@ -15,6 +15,7 @@
 	var pausedMode = false;
 	var debugMode = false;
 	var gridMode = false;
+	var aiMode = false;
 
 	var moveCounter = 0;
 	var lineSegmentCollisionCounter = 0;
@@ -25,6 +26,17 @@
 		var timeLeft = currentTime - prevTime;
 		var halting = false;
 		var collisionCounter = 0
+
+		if (aiMode) {
+			let ballToPaddle = board.ballToPaddle();
+			if (ballToPaddle > 0) {
+				setPaddleVelX (-paddleVel);
+			} else if (ballToPaddle < 0) {
+				setPaddleVelX (paddleVel);
+			} else {
+				setPaddleVelX (0);
+			}
+		}
 
 		while (timeLeft > epsilon) {
 			

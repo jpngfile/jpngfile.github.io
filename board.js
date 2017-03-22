@@ -277,6 +277,17 @@ function Board(width, height) {
 		ctx.closePath();
 	}
 
+	this.ballToPaddle = function () {
+		let paddleCenterX = this.paddle.origin.x + (this.paddle.width/2);
+		if (paddleCenterX > this.circles[0].x){
+			return 1;
+		} else if (paddleCenterX < this.circles[0].x){
+			return -1;
+		} else {
+			return 0;
+		}
+	}
+
 	this.getClosestCollision = function(timeLeft) {
 
 		var collision = {
