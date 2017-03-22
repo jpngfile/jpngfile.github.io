@@ -82,7 +82,9 @@ function Board(width, height) {
 		for (var j = 0; j < numBlockRows; j++) {
 			let blockHorizStart = horizTotalMargin + i;
 			let blockVertStart = vertTotalMargin + (j * blockHeight);
-			this.rectangles.push(new Rectangle(blockHorizStart, blockVertStart, blockHorizStart + blockWidth, blockVertStart + blockHeight, 0, 0))
+			let rect = new Rectangle(blockHorizStart, blockVertStart, blockHorizStart + blockWidth, blockVertStart + blockHeight, 0, 0);
+			rect.layers = j + 1
+			this.rectangles.push(rect);
 		}
 	}
 
@@ -102,12 +104,22 @@ function Board(width, height) {
 			circle.x += circle.vel.x * time;
 			circle.y += circle.vel.y * time;
 		});
-		this.movingLineSegments.concat(this.paddle.sides).forEach(function(line) {
+		this.movingLineSegments.forEach(function(line) {
 			line.x1 += line.vel.x * time;
 			line.x2 += line.vel.x * time;
 			line.y1 += line.vel.y * time;
 			line.y2 += line.vel.y * time;
 		});
+		this.rectangles.concat([this.paddle]).forEach(function (rect) {
+			rect.origin.x += rect.vel.x * time;
+			rect.origin.y += rect.vel.y * time;
+			rect.sides.forEach (function (line) {
+				line.x1 += line.vel.x * time;
+				line.x2 += line.vel.x * time;
+				line.y1 += line.vel.y * time;
+				line.y2 += line.vel.y * time;
+			})
+		})
 		if (loadMode && this.circles.length > 0) {
 			this.circles[0].x += this.paddle.vel.x * time;
 			this.circles[0].y += this.paddle.vel.y * time;
@@ -130,6 +142,10 @@ function Board(width, height) {
 	this.resetBoard = function () {
 		this.circles.push(new Circle(250, 390, 10, 0, 0));
 		this.paddle = new Rectangle(200, 400, 300, 415, 0, 0);
+	}
+
+	this.rgbColour = function (red, blue, green) {
+		return 'rgb(' + red.toString() + ',' + blue.toString() + ',' + green.toString() + ')';
 	}
 
 	this.drawShapes = function (ctx, c, debugMode = false, gridMode = false) {
@@ -194,8 +210,10 @@ function Board(width, height) {
 		allCircles.forEach(function(circle) {
 			ctx.beginPath();
 			ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
+			ctx.fillStyle = this.rgbColour(56, 56, 56);
+			ctx.fill()
 			ctx.stroke();
-		})
+		}, this)
 
 		ctx.beginPath();
 
@@ -208,6 +226,17 @@ function Board(width, height) {
 			ctx.moveTo(line.x1, line.y1);
 			ctx.lineTo(line.x2, line.y2);
 		});
+
+		
+		//ctx.fillRect(0, 0, 100, 150);
+		this.rectangles.forEach (function (rect) {
+			let layers = rect.hasOwnProperty("layers") ? rect.layers : 255;
+			ctx.fillStyle = this.rgbColour (Math.min(255 - (rect.layers*20), 255), 0, 0);
+			ctx.fillRect (rect.origin.x, rect.origin.y, rect.width, rect.height);
+		}, this)
+
+		ctx.fillStyle = this.rgbColour (176, 176, 176);
+		ctx.fillRect (this.paddle.origin.x, this.paddle.origin.y, this.paddle.width, this.paddle.height);
 
 		this.borderLines.forEach(function(borderLine) {
 			if (borderLine.borderType == Border.Types.horizontal) {
@@ -231,6 +260,7 @@ function Board(width, height) {
 		ctx.stroke();
 		//console.log ("end drawing");
 		//ctx.fillText ("total Energy: " + getTotalEnergy(circles).toString(), 20, 20);
+		ctx.fillStyle = 'black';
 		ctx.fillText("Score: " + this.score.toString(), 20, 20);
 		ctx.fillText("Lives: " + this.lives.toString(), 20, 30);
 	}

@@ -42,11 +42,16 @@
 
 				//remove shape on collision
 				if (collision.hasOwnProperty("arr") && collision.hasOwnProperty("index")) {
-					if (collision.arr[collision.index] instanceof Rectangle) {
+					var shape = collision.arr[collision.index];
+					if (shape instanceof Rectangle) {
 						board.incrementScore(10 + collision.circle.bounceCounter);
 						collision.circle.bounceCounter+=1;
 					}
-					collision.arr.splice (collision.index, 1)
+					if (shape.hasOwnProperty("layers") && shape.layers > 1) {
+						collision.arr[collision.index].layers--;
+					} else {
+						collision.arr.splice (collision.index, 1)
+					}
 					if (board.circles.length <= 0) {
 						
 						if (board.lives > 0) {
