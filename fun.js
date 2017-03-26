@@ -1,6 +1,6 @@
 //TODO:
 //add friction to paddle for weird bounce pattern
-//add github board
+//bug where ball moves through paddle when paddle is moving away from ball
 
 (function (window,document){
 	'use strict';

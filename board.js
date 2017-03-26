@@ -94,8 +94,10 @@ function Board(width, height) {
 	this.score = 0;
 	this.lives = 3;
 	this.paddle = new Rectangle(200, 400, 300, 415, 0, 0);
+	this.rightBound = 495;
+	this.leftBound = 5;
 
-	this.updateRectangles = function (layers) {
+	this.updateRectangles = function(layers) {
 		var newRectangles = [];
 		for (var i = 0; i < layers.length; i++) {
 			if (i >= this.rectangles.length) {
@@ -103,12 +105,12 @@ function Board(width, height) {
 			}
 			var rect = this.rectangles[i];
 			rect.layers = layers[i];
-			newRectangles.push (rect);
+			newRectangles.push(rect);
 		}
 		this.rectangles = newRectangles;
 	}
 
-	this.moveCircles = function (time, loadMode = false) {
+	this.moveCircles = function(time, loadMode = false) {
 		this.circles.forEach(function(circle) {
 			circle.x += circle.vel.x * time;
 			circle.y += circle.vel.y * time;
@@ -123,23 +125,41 @@ function Board(width, height) {
 			line.y1 += line.vel.y * time;
 			line.y2 += line.vel.y * time;
 		});
-		this.rectangles.concat([this.paddle]).forEach(function (rect) {
-			rect.origin.x += rect.vel.x * time;
-			rect.origin.y += rect.vel.y * time;
-			rect.sides.forEach (function (line) {
-				line.x1 += line.vel.x * time;
-				line.x2 += line.vel.x * time;
-				line.y1 += line.vel.y * time;
-				line.y2 += line.vel.y * time;
-			})
-		})
+		var mRightBound = this.rightBound;
+		var mLeftBound = this.leftBound;
 		if (loadMode && this.circles.length > 0) {
-			this.circles[0].x += this.paddle.vel.x * time;
-			this.circles[0].y += this.paddle.vel.y * time;
+			mRightBound = mRightBound - this.paddle.width/2 - this.circles[0].radius;
+			mLeftBound = mLeftBound + this.paddle.width/2 + this.circles[0].radius;
+			var mTime = time;
+			if (this.circles[0].x + (this.paddle.vel.x * mTime) + this.circles[0].radius > this.rightBound){
+				mTime = (this.rightBound - this.circles[0].x - this.circles[0].radius) / this.paddle.vel.x
+				//console.log ("beyond bound")
+			} else if (this.circles[0].x + (this.paddle.vel.x* mTime) - this.circles[0].radius < this.leftBound){
+				mTime = (this.leftBound - (this.circles[0].x - this.circles[0].radius)) / this.paddle.vel.x
+			}
+			this.circles[0].x += this.paddle.vel.x * mTime;
+			this.circles[0].y += this.paddle.vel.y * mTime;
 		}
+		this.rectangles.concat([this.paddle]).forEach(function(rect) {
+			var mTime = time;
+			if (rect.origin.x + rect.vel.x * time > mRightBound) {
+				mTime = (mRightBound - rect.origin.x) / rect.vel.x
+				
+			} else if (rect.origin.x + rect.vel.x * time < mLeftBound - rect.width) {
+				mTime = ((mLeftBound - rect.width) - rect.origin.x) / rect.vel.x
+			}
+			rect.origin.x += rect.vel.x * mTime;
+			rect.origin.y += rect.vel.y * mTime;
+			rect.sides.forEach(function(line) {
+				line.x1 += line.vel.x * mTime;
+				line.x2 += line.vel.x * mTime;
+				line.y1 += line.vel.y * mTime;
+				line.y2 += line.vel.y * mTime;
+			})
+		}, this)
 	}
 
-	this.getTotalEnergy = function (circles) {
+	this.getTotalEnergy = function(circles) {
 		var energy = 0;
 		circles.forEach(function(circle) {
 			energy += (0.5 * circle.area() * Math.pow(getLengthOfVector(circle.vel), 2));
@@ -147,21 +167,21 @@ function Board(width, height) {
 		return energy;
 	}
 
-	this.incrementScore = function (points = 10) {
+	this.incrementScore = function(points = 10) {
 		this.score += points;
 	}
 
 
-	this.resetBoard = function () {
+	this.resetBoard = function() {
 		this.circles.push(new Circle(250, 390, 10, 0, 0));
 		this.paddle = new Rectangle(200, 400, 300, 415, 0, 0);
 	}
 
-	this.rgbColour = function (red, blue, green) {
+	this.rgbColour = function(red, blue, green) {
 		return 'rgb(' + red.toString() + ',' + blue.toString() + ',' + green.toString() + ')';
 	}
 
-	this.drawShapes = function (ctx, c, debugMode = false, gridMode = false) {
+	this.drawShapes = function(ctx, c, debugMode = false, gridMode = false) {
 
 		ctx.clearRect(0, 0, c.width, c.height);
 
@@ -240,16 +260,16 @@ function Board(width, height) {
 			ctx.lineTo(line.x2, line.y2);
 		});
 
-		
+
 		//ctx.fillRect(0, 0, 100, 150);
-		this.rectangles.forEach (function (rect) {
+		this.rectangles.forEach(function(rect) {
 			let layers = rect.hasOwnProperty("layers") ? rect.layers : 255;
-			ctx.fillStyle = rect.layers !== 0 ? this.rgbColour (0, Math.min(255 - (rect.layers*20), 255), 0) : this.rgbColour(240, 240, 240);
-			ctx.fillRect (rect.origin.x, rect.origin.y, rect.width, rect.height);
+			ctx.fillStyle = rect.layers !== 0 ? this.rgbColour(0, Math.min(255 - (rect.layers * 20), 255), 0) : this.rgbColour(240, 240, 240);
+			ctx.fillRect(rect.origin.x, rect.origin.y, rect.width, rect.height);
 		}, this)
 
-		ctx.fillStyle = this.rgbColour (176, 176, 176);
-		ctx.fillRect (this.paddle.origin.x, this.paddle.origin.y, this.paddle.width, this.paddle.height);
+		ctx.fillStyle = this.rgbColour(176, 176, 176);
+		ctx.fillRect(this.paddle.origin.x, this.paddle.origin.y, this.paddle.width, this.paddle.height);
 
 		this.borderLines.forEach(function(borderLine) {
 			if (borderLine.borderType == Border.Types.horizontal) {
@@ -278,38 +298,38 @@ function Board(width, height) {
 		ctx.fillText("Lives: " + this.lives.toString(), 20, 30);
 	}
 
-	this.drawGameOver = function (ctx, c) {
-		console.log ("Game over")
-		
+	this.drawGameOver = function(ctx, c) {
+		console.log("Game over")
+
 		ctx.beginPath();
 		ctx.clearRect(0, 0, c.width, c.height);
 		ctx.font = "40px Verdana";
-		ctx.textAlign="center";
+		ctx.textAlign = "center";
 		ctx.fillText("Game Over", c.width / 2, c.height / 2);
 		ctx.stroke();
 		ctx.closePath();
 	}
 
-	this.drawGameWin = function (ctx, c) {
-		console.log ("You win!")
-		
+	this.drawGameWin = function(ctx, c) {
+		console.log("You win!")
+
 		ctx.beginPath();
 		ctx.clearRect(0, 0, c.width, c.height);
 		ctx.font = "40px Verdana";
-		ctx.textAlign="center";
+		ctx.textAlign = "center";
 		ctx.fillText("You win!", c.width / 2, c.height / 2);
 		ctx.stroke();
-		let finalScore = this.score + (30*this.lives);
+		let finalScore = this.score + (30 * this.lives);
 		ctx.font = "20px Verdana";
-		ctx.fillText("Score: " + finalScore, c.width / 2, (c.height/ 2) + 30)
+		ctx.fillText("Score: " + finalScore, c.width / 2, (c.height / 2) + 30)
 		ctx.closePath();
 	}
 
-	this.ballToPaddle = function () {
-		let paddleCenterX = this.paddle.origin.x + (this.paddle.width/2);
-		if (paddleCenterX > this.circles[0].x){
+	this.ballToPaddle = function() {
+		let paddleCenterX = this.paddle.origin.x + (this.paddle.width / 2);
+		if (paddleCenterX > this.circles[0].x) {
 			return 1;
-		} else if (paddleCenterX < this.circles[0].x){
+		} else if (paddleCenterX < this.circles[0].x) {
 			return -1;
 		} else {
 			return 0;
@@ -338,7 +358,7 @@ function Board(width, height) {
 
 		this.circles.forEach(function(circle, circIndex) {
 
-			
+
 			this.borderLines.forEach(function(line) {
 				collision = collisionMin(collision, collisionDetectionLineBorder(circle, line, timeLeft));
 				if (collision.shape === line && line.hasOwnProperty("isBottom")) {
@@ -346,7 +366,7 @@ function Board(width, height) {
 					collision.index = circIndex;
 				}
 			}, this)
-			
+
 
 			this.lineSegments.forEach(function(line, index) {
 				var point1 = new Point(line.x1, line.y1)
