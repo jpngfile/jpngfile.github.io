@@ -71,7 +71,7 @@ function Board(width, height) {
 	var vertMargin = 30;
 	var blockGridWidth = width - 2 * (horrizMargin + horizBorderMargin);
 	var numBlockRows = 6;
-	var numBlockCols = 10;
+	var numBlockCols = 9;
 	let blockHeight = 20;
 	let blockWidth = blockGridWidth / numBlockCols
 
@@ -94,6 +94,19 @@ function Board(width, height) {
 	this.score = 0;
 	this.lives = 3;
 	this.paddle = new Rectangle(200, 400, 300, 415, 0, 0);
+
+	this.updateRectangles = function (layers) {
+		var newRectangles = [];
+		for (var i = 0; i < layers.length; i++) {
+			if (i >= this.rectangles.length) {
+				break;
+			}
+			var rect = this.rectangles[i];
+			rect.layers = layers[i];
+			newRectangles.push (rect);
+		}
+		this.rectangles = newRectangles;
+	}
 
 	this.moveCircles = function (time, loadMode = false) {
 		this.circles.forEach(function(circle) {
@@ -231,7 +244,7 @@ function Board(width, height) {
 		//ctx.fillRect(0, 0, 100, 150);
 		this.rectangles.forEach (function (rect) {
 			let layers = rect.hasOwnProperty("layers") ? rect.layers : 255;
-			ctx.fillStyle = this.rgbColour (Math.min(255 - (rect.layers*20), 255), 0, 0);
+			ctx.fillStyle = rect.layers !== 0 ? this.rgbColour (0, Math.min(255 - (rect.layers*20), 255), 0) : this.rgbColour(240, 240, 240);
 			ctx.fillRect (rect.origin.x, rect.origin.y, rect.width, rect.height);
 		}, this)
 

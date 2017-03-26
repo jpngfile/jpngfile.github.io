@@ -1,9 +1,31 @@
 //TODO:
 //add friction to paddle for weird bounce pattern
 //add github board
+// Git token 94b13986a4f5b453506aa3d2e7d18e4ab895c52c
 
 (function (window,document){
 	'use strict';
+
+	//console.log ("testing env");
+	//console.log ("token: " + config.TOKEN_GITHUB_DOT_COM);
+
+	let gitURL = "https://api.github.com/repos/jpngfile/mySite/stats/commit_activity";
+	function callAjax (url, callback) {
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function() {
+			if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
+				callback(xmlhttp.responseText)
+			} else {
+				//console.log ("failed call");
+				//console.log ("status: " + xmlhttp.status);
+				//console.log ("readyState: " + xmlhttp.readyState);
+			}
+		}
+		xmlhttp.open("GET", url, true);
+		xmlhttp.setRequestHeader("Authorization", "token " + config.TOKEN_GITHUB_DOT_COM)
+		xmlhttp.send();
+	}
+
 
 	let timeSpeed = 50;
 	let epsilon = 0.00001;
@@ -59,7 +81,7 @@
 						board.incrementScore(10 + collision.circle.bounceCounter);
 						collision.circle.bounceCounter+=1;
 					}
-					if (shape.hasOwnProperty("layers") && shape.layers > 1) {
+					if (shape.hasOwnProperty("layers") && shape.layers > 0) {
 						collision.arr[collision.index].layers--;
 					} else {
 						collision.arr.splice (collision.index, 1)
@@ -151,6 +173,16 @@
 		var height = ctx.canvas.height;
 
 		board = new Board (width, height);
+		callAjax (gitURL, function (data) {
+			//console.log ("data: " + data);
+			//console.log ("SUccess")
+			var commits = JSON.parse(data);
+			//console.log (commits);
+			let commitTotals = commits.map (function (week) {return week.total})
+			//console.log (commitTotals)
+			board.updateRectangles (commitTotals);
+		});
+
 		console.log ("init header")
 	}
 
