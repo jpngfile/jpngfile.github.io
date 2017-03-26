@@ -1,7 +1,6 @@
 //TODO:
 //add friction to paddle for weird bounce pattern
 //add github board
-// Git token 94b13986a4f5b453506aa3d2e7d18e4ab895c52c
 
 (function (window,document){
 	'use strict';
@@ -98,6 +97,11 @@
 							halting = true;
 							board.drawGameOver(ctx, c);
 						}
+					}
+					if (board.rectangles.length <= 0) {
+						clearInterval(animation)
+						halting = true
+						board.drawGameWin(ctx, c);
 					}
 				}
 				if (collision.hasOwnProperty("paddleCollided")) {

@@ -290,6 +290,21 @@ function Board(width, height) {
 		ctx.closePath();
 	}
 
+	this.drawGameWin = function (ctx, c) {
+		console.log ("You win!")
+		
+		ctx.beginPath();
+		ctx.clearRect(0, 0, c.width, c.height);
+		ctx.font = "40px Verdana";
+		ctx.textAlign="center";
+		ctx.fillText("You win!", c.width / 2, c.height / 2);
+		ctx.stroke();
+		let finalScore = this.score + (30*this.lives);
+		ctx.font = "20px Verdana";
+		ctx.fillText("Score: " + finalScore, c.width / 2, (c.height/ 2) + 30)
+		ctx.closePath();
+	}
+
 	this.ballToPaddle = function () {
 		let paddleCenterX = this.paddle.origin.x + (this.paddle.width/2);
 		if (paddleCenterX > this.circles[0].x){
