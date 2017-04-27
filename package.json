@@ -1,0 +1,13 @@
+{
+  "name": "mySite",
+  "version": "1.0.0",
+  "description": "personal site",
+  "main": "index.js",
+  "repository": "https://github.com/jpngfile/mySite.git",
+  "author": "Jason P'ng <jsjpng@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4"
+  }
+}

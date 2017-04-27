@@ -167,7 +167,7 @@
 		mainContent.style.borderStyle = "none";
 
 		var c = document.getElementById("myCanvas");
-		c.onclick = setCirclePos;
+		//c.onclick = setCirclePos;
 
 		//var c = document.getElementById("myCanvas");
 		c.width = 500;
@@ -208,7 +208,7 @@
 
 	var leftDown = false;
 	var rightDown = false;
-	let paddleVel = 0.2
+	let paddleVel = 0.3
 	//document.onkeydown = pauseAnimation;
 	document.addEventListener ('keydown', function (event) {
 		if (event.keyCode == 37) {
@@ -221,7 +221,7 @@
 			rightDown = true;
 		} else if (event.keyCode == 38 && loadMode) {
 			//console.log ("Game start");
-			if (board.circles.length > 0) {board.circles[0].vel = new Vector (0.2, -0.2);}
+			if (board.circles.length > 0) {board.circles[0].vel = new Vector (0.3, -0.3);}
 			loadMode = false;
 		} else {
 			pauseAnimation();
