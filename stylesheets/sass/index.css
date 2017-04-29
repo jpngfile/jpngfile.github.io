@@ -1,0 +1,224 @@
+html, body {
+  font-family: sans-serif;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  background-size: cover;
+  background-image: url("../../images/keyboardStock2.jpg"); }
+
+.container {
+  width: 100%; }
+
+.center {
+  margin: auto;
+  width: 50%; }
+
+.masthead {
+  width: 100%;
+  height: 90px;
+  background-color: transparent;
+  position: fixed;
+  color: white;
+  top: 0;
+  z-index: 5;
+  margin-bottom: -100px; }
+
+#masthead-inner {
+  margin-left: 5px; }
+
+.masthead-title {
+  font-size: 18;
+  margin-bottom: 0;
+  color: white; }
+  .masthead-title a:link {
+    text-decoration: none; }
+  .masthead-title a:visited {
+    color: white;
+    text-decoration: none; }
+  .masthead-title a:hover {
+    color: grey; }
+  .masthead-title a:active {
+    color: white; }
+
+/*
+.masthead-title > a:link {
+	text-decoration: none;
+}
+.masthead-title > small a:link {
+	text-decoration: none;
+}
+
+.masthead-title > a:visited {
+	color: white;
+	text-decoration: none;
+}
+.masthead-title > small a:visited {
+	color: white;
+	text-decoration: none;
+}
+
+.masthead-title a:hover {
+	color: grey;
+}
+
+.masthead-title small a:hover {
+	color: grey;
+}
+
+
+.masthead-title a:active {
+	color : white;
+}
+*/
+.masthead > small {
+  margin-top: 0em; }
+
+#main-body {
+  position: relative;
+  display: inline-block;
+  width: 100%; }
+
+.main-body .main-child {
+  /*margin-top: 200px; 
+  border-style: double; */
+  -webkit-box-sizing: border-box;
+  /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;
+  /* Firefox, other Gecko */
+  box-sizing: border-box;
+  /* Opera/IE 8+ */ }
+
+#intro-text {
+  position: relative;
+  background-color: transparent;
+  color: white;
+  width: 50%;
+  padding-top: 50px;
+  margin: auto;
+  /*margin-left: 100px;*/
+  /*margin-right: 100px;*/
+  z-index: 2;
+  left: 0;
+  right: 0; }
+  #intro-text a:link {
+    color: white;
+    text-decoration: none; }
+  #intro-text a:visited {
+    color: white;
+    text-decoration: none; }
+  #intro-text a:hover {
+    color: #e6e6e6; }
+  #intro-text a:active {
+    color: white; }
+
+#intro-header {
+  font-size: 30pt; }
+
+.body-image {
+  position: absolute;
+  margin-top: -90px;
+  /*width: 100%; 
+  margin-top: -150px; */
+  height: 100vh;
+  z-index: 0;
+  /*border-style: double;
+  border-color: blue;*/
+  overflow: hidden; }
+
+#content-image {
+  width: 100%;
+  /*
+  	left : -100%;
+  	right: -100%;
+  	top : -100%;
+  	bottom : -100%;
+  	*/ }
+
+.project-table {
+  padding-top: 20px;
+  color: white;
+  width: 50%;
+  margin: auto; }
+  .project-table th {
+    text-align: left; }
+  .project-table a:link {
+    color: white;
+    text-decoration: none; }
+  .project-table a:visited {
+    color: white;
+    text-decoration: none; }
+  .project-table a:hover {
+    color: #e6e6e6; }
+  .project-table a:active {
+    color: white; }
+
+.heading {
+  text-align: center;
+  font-size: 30px; }
+
+#footer {
+  position: absolute;
+  width: 100%;
+  background: transparent;
+  z-index: 100;
+  text-align: right;
+  bottom: 0; }
+  #footer a:link {
+    color: white;
+    text-decoration: none; }
+  #footer a:visited {
+    color: white;
+    text-decoration: none; }
+  #footer a:hover {
+    color: #e6e6e6; }
+  #footer a:active {
+    color: white; }
+
+#contact-list {
+  list-style-type: none;
+  list-style: none;
+  padding-left: 0; }
+
+#contacts {
+  width: 50%;
+  margin: auto;
+  overflow: hidden;
+  float: right;
+  -webkit-box-sizing: border-box;
+  /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;
+  /* Firefox, other Gecko */
+  box-sizing: border-box; }
+
+.contact-module {
+  padding-right: 10px;
+  float: right;
+  color: white;
+  -webkit-box-sizing: border-box;
+  /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;
+  /* Firefox, other Gecko */
+  box-sizing: border-box; }
+
+/*Animations */
+.animate-in {
+  -webkit-animation: fadeIn .5s ease-in;
+  animation: fadeIn .5s ease-in; }
+
+.animate-out {
+  -webkit-transition: opacity .5s;
+  transition: opacity .5s;
+  opacity: 0; }
+
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0; }
+  to {
+    opacity: 1; } }
+@keyframes fadeIn {
+  from {
+    opacity: 0; }
+  to {
+    opacity: 1; } }
+
+/*# sourceMappingURL=index.css.map */

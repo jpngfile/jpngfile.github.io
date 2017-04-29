@@ -1,0 +1,251 @@
+$header-height : 90px;
+$footer-height : 50px;
+
+html, body {
+	font-family: sans-serif;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	background-size : cover;
+	background-image : url("../../images/keyboardStock2.jpg");
+}
+
+.container {
+	width: 100%;
+}
+
+.center {
+	margin : auto;
+	width : 50%;
+}
+
+@mixin white-links () {
+	a:link{
+		color: white;
+		text-decoration: none;
+	}
+	a:visited{
+		color: white;
+		text-decoration: none;
+	}
+	a:hover {
+		color: #e6e6e6;
+	}
+	a:active {
+		color : white;
+	}
+}
+
+.masthead {
+	width : 100%;
+	height: $header-height;
+	background-color: transparent;
+	position: fixed;
+	color : white;
+	top: 0;
+	z-index : 5;
+	margin-bottom : -100px;
+}
+
+#masthead-inner {
+	margin-left: 5px;
+}
+.masthead-title{
+	font-size: 18;
+	margin-bottom: 0;
+	color: white;
+	a:link{
+		text-decoration: none;
+	}
+	a:visited{
+		color: white;
+		text-decoration: none;
+	}
+	a:hover {
+		color: grey;
+	}
+	a:active {
+		color : white;
+	}
+}
+
+/*
+.masthead-title > a:link {
+	text-decoration: none;
+}
+.masthead-title > small a:link {
+	text-decoration: none;
+}
+
+.masthead-title > a:visited {
+	color: white;
+	text-decoration: none;
+}
+.masthead-title > small a:visited {
+	color: white;
+	text-decoration: none;
+}
+
+.masthead-title a:hover {
+	color: grey;
+}
+
+.masthead-title small a:hover {
+	color: grey;
+}
+
+
+.masthead-title a:active {
+	color : white;
+}
+*/
+.masthead > small {
+	margin-top: 0em;
+}
+
+#main-body {
+	position : relative;
+	display : inline-block;
+	width : 100%;
+
+}
+
+.main-body .main-child{
+	/*margin-top: 200px; 
+	border-style: double; */
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+#intro-text{
+	position : relative;
+	//display : block;
+	//border-style: double;
+	//border-color: red;
+	
+	background-color: transparent;
+	color: white;
+	width : 50%;
+	padding-top : 50px;
+	margin : auto;
+	@include white-links();
+	/*margin-left: 100px;*/
+	/*margin-right: 100px;*/
+	z-index: 2;
+	left :0;
+	right : 0;
+}
+
+#intro-header {
+	font-size: 30pt;
+}
+
+.body-image{
+	position: absolute;
+	margin-top : -$header-height;
+	/*width: 100%; 
+	margin-top: -150px; */
+	height : 100vh;
+	z-index : 0;
+	/*border-style: double;
+	border-color: blue;*/
+	overflow : hidden;
+}
+
+#content-image{
+	width : 100%;
+/*
+	left : -100%;
+	right: -100%;
+	top : -100%;
+	bottom : -100%;
+	*/
+}
+
+.project-table {
+	padding-top : 20px;
+	color : white;
+	width : 50%;
+	margin : auto;
+
+	th {
+		text-align: left;
+	}
+
+	@include white-links ();
+}
+
+.heading{
+	text-align: center;
+	font-size: 30px;
+}
+
+
+#footer{
+	@include white-links();
+	position : absolute;
+	width : 100%;
+	//height : $footer-height;
+	background: transparent;
+	z-index : 100;
+	text-align : right;
+	bottom : 0;
+}
+
+#contact-list{
+	list-style-type: none;
+	list-style: none;
+	padding-left: 0;
+}
+
+.contact-icon {
+
+}
+
+#contacts {
+	width : 50%;
+	margin : auto;
+	//border-style : double;
+	//border-color : blue;
+	overflow : hidden;
+	float : right;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;  
+}
+
+.contact-module {
+	//border-style: double;
+	//border-color: red;
+	padding-right : 10px;
+	float : right;
+	color : white;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;  
+}
+
+/*Animations */
+
+.animate-in {
+	-webkit-animation : fadeIn .5s ease-in;
+	animation : fadeIn .5s ease-in;
+}
+
+.animate-out {
+	-webkit-transition : opacity .5s;
+	transition : opacity .5s;
+	opacity : 0;
+}
+
+
+@-webkit-keyframes fadeIn {
+	from {opacity: 0;}
+	to { opacity: 1;}
+}
+
+@keyframes fadeIn {
+	from {opacity: 0;}
+	to {opacity: 1;}
+}
