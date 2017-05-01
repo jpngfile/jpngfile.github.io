@@ -21,7 +21,7 @@
 			}
 		}
 		xmlhttp.open("GET", url, true);
-		xmlhttp.setRequestHeader("Authorization", "token " + config.TOKEN_GITHUB_DOT_COM)
+		//xmlhttp.setRequestHeader("Authorization", "token " + config.TOKEN_GITHUB_DOT_COM)
 		xmlhttp.send();
 	}
 
