@@ -5,7 +5,7 @@
 (function (window,document){
 	'use strict';
 
-	//console.log ("testing env");
+	console.log ("testing env");
 	//console.log ("token: " + config.TOKEN_GITHUB_DOT_COM);
 
 	let gitURL = "https://api.github.com/repos/jpngfile/mySite/stats/commit_activity";
