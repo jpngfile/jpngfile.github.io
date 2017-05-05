@@ -169,12 +169,21 @@ html, body {
 	color : white;
 	width : 50%;
 	margin : auto;
+	//border: 1px solid white;
 
 	th {
 		text-align: left;
 	}
+	td {
+		//border: 1px solid white;
+		vertical-align : top;
+	}
 
 	@include white-links ();
+}
+
+.white-border {
+	//border: 1px solid white;
 }
 
 .heading{

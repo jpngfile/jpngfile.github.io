@@ -142,6 +142,8 @@ html, body {
   margin: auto; }
   .project-table th {
     text-align: left; }
+  .project-table td {
+    vertical-align: top; }
   .project-table a:link {
     color: white;
     text-decoration: none; }
