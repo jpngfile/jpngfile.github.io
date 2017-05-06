@@ -190,7 +190,7 @@
 				//console.log (commitTotals)
 				board.updateRectangles (commitTotals);
 			} else if (xmlhttp.status === 202) {
-				setTimeout (callAjax (girURL, updateBoard), 1000);
+				setTimeout (callAjax (gitURL, updateBoard), 1000);
 			} else {
 				console.log ("Can't handle status: " + xmlhttp.status)
 			}

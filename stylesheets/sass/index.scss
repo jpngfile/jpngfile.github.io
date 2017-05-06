@@ -70,36 +70,6 @@ html, body {
 	}
 }
 
-/*
-.masthead-title > a:link {
-	text-decoration: none;
-}
-.masthead-title > small a:link {
-	text-decoration: none;
-}
-
-.masthead-title > a:visited {
-	color: white;
-	text-decoration: none;
-}
-.masthead-title > small a:visited {
-	color: white;
-	text-decoration: none;
-}
-
-.masthead-title a:hover {
-	color: grey;
-}
-
-.masthead-title small a:hover {
-	color: grey;
-}
-
-
-.masthead-title a:active {
-	color : white;
-}
-*/
 .masthead > small {
 	margin-top: 0em;
 }
@@ -124,10 +94,10 @@ html, body {
 	//display : block;
 	//border-style: double;
 	//border-color: red;
-	
 	background-color: transparent;
 	color: white;
 	width : 50%;
+	min-width : 400px;
 	padding-top : 50px;
 	margin : auto;
 	@include white-links();
@@ -136,6 +106,9 @@ html, body {
 	z-index: 2;
 	left :0;
 	right : 0;
+	p {
+		//font-size : 30px;
+	}
 }
 
 #intro-header {
@@ -168,6 +141,7 @@ html, body {
 	padding-top : 20px;
 	color : white;
 	width : 50%;
+	min-width: 400px;
 	margin : auto;
 	//border: 1px solid white;
 
