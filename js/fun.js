@@ -5,19 +5,21 @@
 (function (window,document){
 	'use strict';
 
-	//console.log ("testing env");
+	console.log ("testing env");
 	//console.log ("token: " + config.TOKEN_GITHUB_DOT_COM);
 
 	let gitURL = "https://api.github.com/repos/jpngfile/mySite/stats/commit_activity";
 	function callAjax (url, callback) {
 		var xmlhttp = new XMLHttpRequest();
 		xmlhttp.onreadystatechange = function() {
-			if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
-				callback(xmlhttp.responseText)
-			} else {
-				//console.log ("failed call");
-				//console.log ("status: " + xmlhttp.status);
-				//console.log ("readyState: " + xmlhttp.readyState);
+			//if (xmlhttp.readyState === 4 && xmlhttp.status === 200){
+				//callback(xmlhttp.responseText)
+		    if (xmlhttp.readyState === 4 && (xmlhttp.status === 200 || xmlhttp.status === 202)){
+		    	callback(xmlhttp)
+		    } else {
+				console.log ("failed call");
+				console.log ("status: " + xmlhttp.status);
+				console.log ("readyState: " + xmlhttp.readyState);
 			}
 		}
 		xmlhttp.open("GET", url, true);
@@ -177,14 +179,21 @@
 		var height = ctx.canvas.height;
 
 		board = new Board (width, height);
-		callAjax (gitURL, function (data) {
-			//console.log ("data: " + data);
-			//console.log ("SUccess")
-			var commits = JSON.parse(data);
-			//console.log (commits);
-			let commitTotals = commits.map (function (week) {return week.total})
-			//console.log (commitTotals)
-			board.updateRectangles (commitTotals);
+		callAjax (gitURL, function updateBoard (xmlhttp) {
+			if (xmlhttp.status === 200){
+				//console.log ("data: " + data);
+				//console.log ("SUccess")
+				let data = xmlhttp.responseText;
+				var commits = JSON.parse(data);
+				//console.log (commits);
+				let commitTotals = commits.map (function (week) {return week.total})
+				//console.log (commitTotals)
+				board.updateRectangles (commitTotals);
+			} else if (xmlhttp.status === 202) {
+				setTimeout (callAjax (gitURL, updateBoard), 1000);
+			} else {
+				console.log ("Can't handle status: " + xmlhttp.status)
+			}
 		});
 
 		console.log ("init header")

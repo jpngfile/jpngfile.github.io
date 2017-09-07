@@ -41,36 +41,6 @@ html, body {
   .masthead-title a:active {
     color: white; }
 
-/*
-.masthead-title > a:link {
-	text-decoration: none;
-}
-.masthead-title > small a:link {
-	text-decoration: none;
-}
-
-.masthead-title > a:visited {
-	color: white;
-	text-decoration: none;
-}
-.masthead-title > small a:visited {
-	color: white;
-	text-decoration: none;
-}
-
-.masthead-title a:hover {
-	color: grey;
-}
-
-.masthead-title small a:hover {
-	color: grey;
-}
-
-
-.masthead-title a:active {
-	color : white;
-}
-*/
 .masthead > small {
   margin-top: 0em; }
 
@@ -94,6 +64,7 @@ html, body {
   background-color: transparent;
   color: white;
   width: 50%;
+  min-width: 400px;
   padding-top: 50px;
   margin: auto;
   /*margin-left: 100px;*/
@@ -139,9 +110,12 @@ html, body {
   padding-top: 20px;
   color: white;
   width: 50%;
+  min-width: 400px;
   margin: auto; }
   .project-table th {
     text-align: left; }
+  .project-table td {
+    vertical-align: top; }
   .project-table a:link {
     color: white;
     text-decoration: none; }
