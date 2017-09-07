@@ -198,8 +198,6 @@ html, body {
 @media (max-width: 500px) {
   .intro-text {
     width: 90%;
-    font-size: 30px; }
-
-  color: blue; }
+    font-size: 30px; } }
 
 /*# sourceMappingURL=index.css.map */
