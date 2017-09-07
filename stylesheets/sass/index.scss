@@ -89,7 +89,7 @@ html, body {
     box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
-#intro-text{
+.intro-text{
 	position : relative;
 	//display : block;
 	//border-style: double;
@@ -232,4 +232,13 @@ html, body {
 @keyframes fadeIn {
 	from {opacity: 0;}
 	to {opacity: 1;}
+}
+
+@media(max-width: 500px) {
+  .intro-text {
+    width: 90%;
+    font-size: 30px
+  }
+
+  color: blue;
 }

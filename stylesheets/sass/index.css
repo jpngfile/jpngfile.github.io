@@ -59,7 +59,7 @@ html, body {
   box-sizing: border-box;
   /* Opera/IE 8+ */ }
 
-#intro-text {
+.intro-text {
   position: relative;
   background-color: transparent;
   color: white;
@@ -72,15 +72,15 @@ html, body {
   z-index: 2;
   left: 0;
   right: 0; }
-  #intro-text a:link {
+  .intro-text a:link {
     color: white;
     text-decoration: none; }
-  #intro-text a:visited {
+  .intro-text a:visited {
     color: white;
     text-decoration: none; }
-  #intro-text a:hover {
+  .intro-text a:hover {
     color: #e6e6e6; }
-  #intro-text a:active {
+  .intro-text a:active {
     color: white; }
 
 #intro-header {
@@ -195,5 +195,11 @@ html, body {
     opacity: 0; }
   to {
     opacity: 1; } }
+@media (max-width: 500px) {
+  .intro-text {
+    width: 90%;
+    font-size: 30px; }
+
+  color: blue; }
 
 /*# sourceMappingURL=index.css.map */
